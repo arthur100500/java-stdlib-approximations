@@ -50,11 +50,12 @@ public final class OptionalDoubleImpl {
         return new OptionalDoubleImpl(x, true);
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object other) {
         if (other == this)
             return true;
 
-        if (other.getClass() == OptionalDoubleImpl.class) { // TODO: change on 'typeIs'
+        if (Engine.typeIs(other, OptionalDoubleImpl.class)) {
             OptionalDoubleImpl otherOptional = (OptionalDoubleImpl) other;
             double otherValue = otherOptional.value;
             boolean otherPresent = otherOptional.isPresent;

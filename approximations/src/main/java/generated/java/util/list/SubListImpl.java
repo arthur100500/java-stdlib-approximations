@@ -227,13 +227,12 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return true;
     }
 
-    @SuppressWarnings({"DataFlowIssue", "unchecked"})
+    @SuppressWarnings({"unchecked", "EqualsWhichDoesntCheckParameterClass"})
     public boolean equals(Object o) {
         if (o == this)
             return true;
 
-        // TODO: create via typeEquals
-        if (o == null || o.getClass() != SubList.class)
+        if (o == null || !Engine.typeIs(o, SubListImpl.class))
             return false;
 
         SubListImpl<E> other = (SubListImpl<E>) o;

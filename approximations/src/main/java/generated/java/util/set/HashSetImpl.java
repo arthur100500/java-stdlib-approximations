@@ -84,7 +84,7 @@ public class HashSetImpl<E> extends AbstractSetImpl<E> implements Cloneable, Ser
     }
 
     public boolean equals(Object other) {
-        return other.getClass() == java.util.HashSet.class && super.equals(other);
+        return Engine.typeIs(other, HashSetImpl.class) && super.equals(other);
     }
 
     public int hashCode() {

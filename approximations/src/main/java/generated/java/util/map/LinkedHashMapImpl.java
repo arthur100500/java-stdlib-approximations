@@ -78,8 +78,7 @@ public class LinkedHashMapImpl<K, V> extends HashMapImpl<K, V> {
     }
 
     public boolean equals(Object other) {
-        // TODO: create via typeEquals
-        return other.getClass() == java.util.LinkedHashMap.class && super.equals(other);
+        return Engine.typeIs(other, LinkedHashMapImpl.class) && super.equals(other);
     }
 
     public void forEach(BiConsumer<? super K, ? super V> userAction) {

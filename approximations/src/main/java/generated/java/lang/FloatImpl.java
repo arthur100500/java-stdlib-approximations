@@ -250,8 +250,9 @@ public final class FloatImpl implements Comparable<FloatImpl>, Serializable {
         return this.value;
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object obj) {
-        if (obj instanceof FloatImpl)
+        if (Engine.typeIs(obj, FloatImpl.class))
             return this.value == ((FloatImpl) obj).value;
 
         return false;

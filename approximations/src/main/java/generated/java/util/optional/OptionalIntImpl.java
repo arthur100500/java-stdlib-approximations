@@ -50,11 +50,12 @@ public final class OptionalIntImpl {
         return new OptionalIntImpl(x, true);
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object other) {
         if (other == this)
             return true;
 
-        if (other.getClass() == OptionalIntImpl.class) { // TODO: change on 'typeIs'
+        if (Engine.typeIs(other, OptionalIntImpl.class)) {
             OptionalIntImpl otherOptional = (OptionalIntImpl) other;
             int otherValue = otherOptional.value;
             boolean otherPresent = otherOptional.isPresent;

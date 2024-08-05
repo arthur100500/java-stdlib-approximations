@@ -234,8 +234,9 @@ public final class IntegerImpl implements Comparable<IntegerImpl>, Serializable 
         return this.value;
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object obj) {
-        if (obj instanceof IntegerImpl)
+        if (Engine.typeIs(obj, IntegerImpl.class))
             return this.value == ((IntegerImpl) obj).value;
 
         return false;

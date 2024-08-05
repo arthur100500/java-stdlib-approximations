@@ -246,8 +246,9 @@ public final class DoubleImpl implements Comparable<DoubleImpl>, Serializable {
         return this.value;
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object obj) {
-        if (obj instanceof DoubleImpl)
+        if (Engine.typeIs(obj, DoubleImpl.class))
             return this.value == ((DoubleImpl) obj).value;
 
         return false;

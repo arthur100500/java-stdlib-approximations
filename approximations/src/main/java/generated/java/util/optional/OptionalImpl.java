@@ -52,12 +52,12 @@ public final class OptionalImpl<T> {
         return new OptionalImpl<>(obj);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "EqualsWhichDoesntCheckParameterClass"})
     public boolean equals(Object other) {
         if (other == this)
             return true;
 
-        if (other.getClass() == OptionalImpl.class) { // TODO: change on 'typeIs'
+        if (Engine.typeIs(other, OptionalImpl.class)) {
             T otherValue = ((OptionalImpl<T>) other).value;
             return LibSLRuntime.equals(this.value, otherValue);
         }

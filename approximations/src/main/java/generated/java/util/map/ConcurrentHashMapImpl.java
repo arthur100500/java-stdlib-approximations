@@ -76,8 +76,7 @@ public class ConcurrentHashMapImpl<K, V> extends AbstractMapImpl<K, V> implement
     }
 
     public boolean equals(Object other) {
-        // TODO: create via typeEquals
-        return other.getClass() == java.util.concurrent.ConcurrentHashMap.class && super.equals(other);
+        return Engine.typeIs(other, ConcurrentHashMapImpl.class) && super.equals(other);
     }
 
     public void forEach(BiConsumer<? super K, ? super V> userAction) {

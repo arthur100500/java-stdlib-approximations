@@ -49,11 +49,12 @@ public final class OptionalLongImpl {
         return new OptionalLongImpl(x);
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object other) {
         if (other == this)
             return true;
 
-        if (other.getClass() == OptionalLongImpl.class) { // TODO: change on 'typeIs'
+        if (Engine.typeIs(other, OptionalLongImpl.class)) {
             OptionalLongImpl otherOptional = (OptionalLongImpl) other;
             long otherValue = otherOptional.value;
             boolean otherPresent = otherOptional.isPresent;

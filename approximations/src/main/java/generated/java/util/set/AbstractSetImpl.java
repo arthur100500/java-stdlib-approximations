@@ -93,12 +93,20 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         _getStorage().set(key, LibSLGlobals.SOMETHING);
     }
 
+    @SuppressWarnings("unchecked")
     public boolean _addAllElements(Collection<? extends E> c) {
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         int lengthBeforeAdd = storage.size();
-        for (E key : c) {
-            if (!storage.hasKey(key))
-                _add(key);
+
+        if (c instanceof AbstractSetImpl<?>) {
+            AbstractSetImpl<E> other = (AbstractSetImpl<E>) c;
+            LibSLRuntime.Map<E, Object> otherStorage = other._getStorage();
+            storage.union(otherStorage);
+        } else {
+            for (E key : c) {
+                if (!storage.hasKey(key))
+                    _add(key);
+            }
         }
 
         if (lengthBeforeAdd != storage.size()) {

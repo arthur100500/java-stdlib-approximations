@@ -68,9 +68,17 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private void _addAllElements(Map<? extends K, ? extends V> m) {
-        Set<? extends Entry<? extends K, ? extends V>> entrySet = m.entrySet();
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
+        if (m instanceof AbstractMapImpl<?, ?>) {
+            AbstractMapImpl<K, V> other = (AbstractMapImpl<K, V>) m;
+            LibSLRuntime.Map<K, Map.Entry<K, V>> otherStorage = other._getStorage();
+            storage.union(otherStorage);
+            return;
+        }
+
+        Set<? extends Entry<? extends K, ? extends V>> entrySet = m.entrySet();
         for (Entry<? extends K, ? extends V> oEntry : entrySet) {
             K key = oEntry.getKey();
             V value = oEntry.getValue();

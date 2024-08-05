@@ -99,11 +99,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
             Engine.assume(otherStorage != null);
             int otherLength = otherStorage.size();
             Engine.assume(otherLength >= 0);
-            for (int i = 0; i < otherLength; i++) {
-                E item = otherStorage.get(i);
-                storage.insert(index, item);
-                index++;
-            }
+            otherStorage.copy(storage, 0, index, otherLength);
         } else {
             for (E item : c) {
                 storage.insert(index, item);

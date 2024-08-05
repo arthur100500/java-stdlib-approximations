@@ -153,7 +153,7 @@ public class LinkedHashSet_Decoder implements ObjectDecoder {
             decoder.invokeMethod(m_add, args);
 
             map.remove(key);
-            length -= 1;
+            length--;
         }
     }
 }

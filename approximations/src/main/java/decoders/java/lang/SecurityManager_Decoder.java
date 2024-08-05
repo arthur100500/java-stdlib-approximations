@@ -10,7 +10,7 @@ import org.usvm.api.decoder.ObjectDecoder;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("ForLoopReplaceableByForEach")
+@SuppressWarnings({"ForLoopReplaceableByForEach", "removal"})
 @DecoderFor(SecurityManager.class)
 public final class SecurityManager_Decoder implements ObjectDecoder {
     private volatile JcMethod cached_SecurityManager_ctor = null;

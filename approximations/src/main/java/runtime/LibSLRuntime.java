@@ -10,53 +10,51 @@ import org.usvm.api.SymbolicIdentityMap;
 import org.usvm.api.SymbolicList;
 import org.usvm.api.SymbolicMap;
 
-@SuppressWarnings({"unused", "ManualMinMaxCalculation", "ExplicitArrayFilling"})
+@SuppressWarnings("unused")
 public final class LibSLRuntime {
 
-    /*
-    public static final class Token {
-        public static final Token INSTANCE = new Token();
-
-        private Token() {}
-    }
-    */
     private static final Object SOMETHING = LibSLRuntime.class;
-
-    public interface HasAutomaton {
-    }
 
     @Target(ElementType.CONSTRUCTOR)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface DirectCallOnly {
     }
 
-    public interface Automaton {
-    }
-
-    @Target(ElementType.CONSTRUCTOR)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface AutomatonConstructor {
-    }
-
     public static abstract class LibSLException extends Error {
+
+        @java.io.Serial
+        private static final long serialVersionUID = 4980196508277280341L;
+
         private LibSLException(final String msg) {
             super(msg);
         }
     }
 
     public static final class StateCheckException extends LibSLException {
+
+        @java.io.Serial
+        private static final long serialVersionUID = 4980196508277280343L;
+
         private StateCheckException(final String msg) {
             super(msg);
         }
     }
 
     public static final class SemanticViolationException extends LibSLException {
+
+        @java.io.Serial
+        private static final long serialVersionUID = 4980196508277280344L;
+
         private SemanticViolationException(final String msg) {
             super(msg);
         }
     }
 
     public static final class IncompleteSpecificationException extends LibSLException {
+
+        @java.io.Serial
+        private static final long serialVersionUID = 4980196508277280345L;
+
         private IncompleteSpecificationException(final String msg) {
             // #question: can we pass class and method names here? (counterargument: string bloat)
             super(msg);
@@ -81,6 +79,7 @@ public final class LibSLRuntime {
     private static volatile int guid = 0;
     private static final Object guidLock = new Object();
 
+    @SuppressWarnings("NonAtomicOperationOnVolatileField")
     public static int getUniqueId() {
         // TODO: enable synchronization when parallel execution is allowed
         //synchronized (guidLock) {
@@ -117,15 +116,15 @@ public final class LibSLRuntime {
         int len = 0;
         int pos = BUFF_SIZE_BYTE;
         while (v != 0) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = (char) ('0' + (v % 10));
             v /= 10;
         }
 
         if (isNegative) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = '-';
         }
 
@@ -151,15 +150,15 @@ public final class LibSLRuntime {
         int len = 0;
         int pos = BUFF_SIZE_SHORT;
         while (v != 0) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = (char) ('0' + (v % 10));
             v /= 10;
         }
 
         if (isNegative) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = '-';
         }
 
@@ -185,15 +184,15 @@ public final class LibSLRuntime {
         int len = 0;
         int pos = BUFF_SIZE_INT;
         while (v != 0) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = (char) ('0' + (v % 10));
             v /= 10;
         }
 
         if (isNegative) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = '-';
         }
 
@@ -219,15 +218,15 @@ public final class LibSLRuntime {
         int len = 0;
         int pos = BUFF_SIZE_LONG;
         while (v != 0) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = (char) ('0' + (v % 10));
             v /= 10;
         }
 
         if (isNegative) {
-            pos -= 1;
-            len += 1;
+            pos--;
+            len++;
             chars[pos] = '-';
         }
 
@@ -252,6 +251,7 @@ public final class LibSLRuntime {
     private static final int FLOAT_MULTIPLIER_SCIENTIFIC_count = 6;
     private static final int FLOAT_MULTIPLIER_SCIENTIFIC_int = (int) FLOAT_MULTIPLIER_SCIENTIFIC;
 
+    @SuppressWarnings("ManualMinMaxCalculation")
     public static String toString(float v) {
         if (v != v)
             return "NaN";
@@ -283,12 +283,12 @@ public final class LibSLRuntime {
             // corrections
             if (remainder - (float) fraction >= 0.5f) {
                 // rounding of last decimal digit
-                fraction += 1;
+                fraction++;
 
                 // overflow?
                 if (fraction >= FLOAT_MULTIPLIER_REGULAR_int) {
                     fraction = 0;
-                    integral += 1;
+                    integral++;
 
                     // overflow?
                     if (integral >= 10)
@@ -334,7 +334,7 @@ public final class LibSLRuntime {
                 }
                 if (v >= 1E+1f) {
                     v *= 1E-1f;
-                    exp += 1;
+                    exp++;
                 }
             }
             if (v > 0.0f && v <= 1.0f) {
@@ -360,7 +360,7 @@ public final class LibSLRuntime {
                 }
                 if (v < 1E-0f) {
                     v *= 1E1f;
-                    exp -= 1;
+                    exp--;
                 }
             }
 
@@ -372,17 +372,17 @@ public final class LibSLRuntime {
             // corrections
             if (remainder - (float) fraction >= 0.5f) {
                 // rounding of last decimal digit
-                fraction += 1;
+                fraction++;
 
                 // overflow?
                 if (fraction >= FLOAT_MULTIPLIER_SCIENTIFIC_int) {
                     fraction = 0;
-                    integral += 1;
+                    integral++;
 
                     // overflow?
                     if (integral >= 10) {
                         integral = 1;
-                        exp += 1;
+                        exp++;
                     }
                 }
             }
@@ -400,6 +400,7 @@ public final class LibSLRuntime {
         return (isNegative ? "-" : "").concat(result);
     }
 
+    @SuppressWarnings("ExplicitArrayFilling")
     private static String prepareFloatFraction(int decimal, final int expectedFractionLength) {
         if (decimal == 0)
             return "0";
@@ -408,7 +409,7 @@ public final class LibSLRuntime {
         int cutZeroes = 0;
         while (decimal % 10 == 0) {
             decimal /= 10;
-            cutZeroes += 1;
+            cutZeroes++;
         }
 
         final String decimals = toString(decimal);
@@ -435,6 +436,7 @@ public final class LibSLRuntime {
     private static final int DOUBLE_MULTIPLIER_SCIENTIFIC_count = 15;
     private static final long DOUBLE_MULTIPLIER_SCIENTIFIC_long = (long) DOUBLE_MULTIPLIER_SCIENTIFIC;
 
+    @SuppressWarnings("ManualMinMaxCalculation")
     public static String toString(double v) {
         if (v != v)
             return "NaN";
@@ -466,12 +468,12 @@ public final class LibSLRuntime {
             // corrections
             if (remainder - (double) fraction >= 0.5d) {
                 // rounding of last decimal digit
-                fraction += 1;
+                fraction++;
 
                 // overflow?
                 if (fraction >= DOUBLE_MULTIPLIER_REGULAR_long) {
                     fraction = 0;
-                    integral += 1;
+                    integral++;
 
                     // overflow?
                     if (integral >= 10)
@@ -529,7 +531,7 @@ public final class LibSLRuntime {
                 }
                 if (v >= 1E+1) {
                     v *= 1E-1;
-                    exp += 1;
+                    exp++;
                 }
             }
             if (v > 0.0 && v <= 1.0) {
@@ -567,7 +569,7 @@ public final class LibSLRuntime {
                 }
                 if (v < 1E-0) {
                     v *= 1E1;
-                    exp -= 1;
+                    exp--;
                 }
             }
 
@@ -579,17 +581,17 @@ public final class LibSLRuntime {
             // corrections
             if (remainder - (double) fraction >= 0.5d) {
                 // rounding of last decimal digit
-                fraction += 1;
+                fraction++;
 
                 // overflow?
                 if (fraction >= DOUBLE_MULTIPLIER_SCIENTIFIC_long) {
                     fraction = 0;
-                    integral += 1;
+                    integral++;
 
                     // overflow?
                     if (integral >= 10) {
                         integral = 1;
-                        exp += 1;
+                        exp++;
                     }
                 }
             }
@@ -607,6 +609,7 @@ public final class LibSLRuntime {
         return (isNegative ? "-" : "").concat(result);
     }
 
+    @SuppressWarnings("ExplicitArrayFilling")
     private static String prepareDoubleFraction(long decimal, final int expectedFractionLength) {
         if (decimal == 0)
             return "0";
@@ -615,7 +618,7 @@ public final class LibSLRuntime {
         int cutZeroes = 0;
         while (decimal % 10 == 0) {
             decimal /= 10;
-            cutZeroes += 1;
+            cutZeroes++;
         }
 
         final String decimals = toString(decimal);
@@ -726,6 +729,7 @@ public final class LibSLRuntime {
         return v;
     }
 
+    @SuppressWarnings("UseHashCodeMethodInspection")
     public static int hashCode(final long v) {
         return (int) (v ^ (v >>> 32));
     }
@@ -744,22 +748,21 @@ public final class LibSLRuntime {
         return Double.hashCode(v);
     }
 
-    public static <V> int hashCode(final SymbolicList<V> v) {
+    public static <V> int hashCode(SymbolicList<V> v, int start, int end) {
         if (v == null)
             return 0;
 
-        final int count = v.size();
-        if (count == 0)
-            return 1;
-        Engine.assume(count > 0);
-
-        // FIXME: use less complex approach
+        Engine.assume(start >= 0);
+        Engine.assume(end >= 0 && end <= v.size());
         int res = 1;
-
-        for (int i = 0; i < count; i++)
+        for (int i = start; i < end; i++)
             res = 31 * res + hashCode(v.get(i));
 
         return res;
+    }
+
+    public static <V> int hashCode(SymbolicList<V> v) {
+        return hashCode(v, 0, v.size());
     }
 
     public static <K, V> int hashCode(final Map<K, V> v) {
@@ -781,7 +784,7 @@ public final class LibSLRuntime {
             res += hashCode(key) ^ hashCode(unseen.get(key));
 
             unseen.remove(key);
-            count -= 1;
+            count--;
         }
 
         return res;
@@ -886,7 +889,7 @@ public final class LibSLRuntime {
                 return false;
 
             unseen.remove(key);
-            length -= 1;
+            length--;
         }
         return true;
     }
@@ -929,6 +932,7 @@ public final class LibSLRuntime {
     // a helper class for complex "array<T>"-related actions
     public static final class ArrayActions {
 
+        @SuppressWarnings({"DataFlowIssue", "SuspiciousSystemArraycopy"})
         public static <T> void copy(final Object src, final int srcPos,
                                     final Object dst, final int dstPos,
                                     final int count) {
@@ -941,6 +945,7 @@ public final class LibSLRuntime {
             System.arraycopy(src, srcPos, dst, dstPos, count);
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final byte[] arr, final byte value) {
             Engine.assume(arr != null);
 
@@ -951,6 +956,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final short[] arr, final short value) {
             Engine.assume(arr != null);
 
@@ -961,6 +967,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final int[] arr, final int value) {
             Engine.assume(arr != null);
 
@@ -971,6 +978,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final long[] arr, final long value) {
             Engine.assume(arr != null);
 
@@ -981,6 +989,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final float[] arr, final float value) {
             Engine.assume(arr != null);
 
@@ -991,6 +1000,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final double[] arr, final double value) {
             Engine.assume(arr != null);
 
@@ -1001,6 +1011,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fill(final char[] arr, final char value) {
             Engine.assume(arr != null);
 
@@ -1011,6 +1022,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static <T> void fill(final T[] arr, final T value) {
             Engine.assume(arr != null);
 
@@ -1021,6 +1033,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final byte[] arr,
                                      final int fromIndex, final int toIndex,
                                      final byte value) {
@@ -1037,6 +1050,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final short[] arr,
                                      final int fromIndex, final int toIndex,
                                      final short value) {
@@ -1053,6 +1067,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final int[] arr,
                                      final int fromIndex, final int toIndex,
                                      final int value) {
@@ -1069,6 +1084,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final long[] arr,
                                      final int fromIndex, final int toIndex,
                                      final long value) {
@@ -1085,6 +1101,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final float[] arr,
                                      final int fromIndex, final int toIndex,
                                      final float value) {
@@ -1101,6 +1118,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final double[] arr,
                                      final int fromIndex, final int toIndex,
                                      final double value) {
@@ -1117,6 +1135,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static void fillRange(final char[] arr,
                                      final int fromIndex, final int toIndex,
                                      final char value) {
@@ -1133,6 +1152,7 @@ public final class LibSLRuntime {
                 arr[i] = value;
         }
 
+        @SuppressWarnings({"DataFlowIssue", "ConstantValue"})
         public static <T> void fillRange(final T[] arr,
                                          final int fromIndex, final int toIndex,
                                          final T value) {
@@ -1148,20 +1168,21 @@ public final class LibSLRuntime {
             for (int i = fromIndex; i < toIndex; i++)
                 arr[i] = value;
         }
-
     }
-
 
     // a helper class for complex "list<T>"-related actions
     public static final class ListActions {
         private static final int INDEX_NOT_FOUND = -1;
 
-        public static int find(final SymbolicList<?> list, final Object value,
-                               final int from, final int to) {
+        private static void addAssumptions(SymbolicList<?> list, int from, int to) {
             // general assumptions for this function to do something useful
             Engine.assume(list != null);
             Engine.assume(0 <= from);
             Engine.assume(from <= to);
+        }
+
+        public static int find(SymbolicList<?> list, Object value, int from, int to) {
+            addAssumptions(list, from, to);
 
             // TODO: is there a more efficient solution?
             if (value == null) {
@@ -1169,20 +1190,42 @@ public final class LibSLRuntime {
                     if (list.get(i) == null)
                         return i;
                 }
-            } else {
-                for (int i = from; i < to; i++) {
-                    final Object item = list.get(i);
-                    if (value == item || value.equals(item))
-                        return i;
-                }
+                return INDEX_NOT_FOUND;
+            }
+
+            for (int i = from; i < to; i++) {
+                final Object item = list.get(i);
+                if (value == item || value.equals(item))
+                    return i;
             }
 
             return INDEX_NOT_FOUND;
         }
 
+        public static int findBack(SymbolicList<?> list, Object value, int from, int to) {
+            addAssumptions(list, from, to);
+
+            // TODO: is there a more efficient solution?
+            if (value == null) {
+                for (int i = to - 1; i >= from; i--) {
+                    if (list.get(i) == null)
+                        return i;
+                }
+                return INDEX_NOT_FOUND;
+            }
+
+            for (int i = to - 1; i >= from; i--) {
+                final Object item = list.get(i);
+                if (value == item || value.equals(item))
+                    return i;
+            }
+
+            return INDEX_NOT_FOUND;
+        }
     }
 
 
+    @SuppressWarnings("DataFlowIssue")
     public static final class Map<K, V> {
         Container<K, V> map;
 
@@ -1272,7 +1315,7 @@ public final class LibSLRuntime {
                         map.set(key, unseen.get(key));
 
                         unseen.remove(key);
-                        count -= 1;
+                        count--;
                     }
                 }
             }
@@ -1301,7 +1344,7 @@ public final class LibSLRuntime {
                         map.set(key, unseen.get(key));
 
                     unseen.remove(key);
-                    count -= 1;
+                    count--;
                 }
             }
         }
@@ -1340,6 +1383,7 @@ public final class LibSLRuntime {
             super(KIND_HASHMAP);
         }
 
+        @SuppressWarnings("DataFlowIssue")
         @Override
         public void merge(Map.Container<K, V> container) {
             Engine.assume(container instanceof HashMapContainer);
@@ -1398,6 +1442,7 @@ public final class LibSLRuntime {
             super(KIND_IDENTITY_MAP);
         }
 
+        @SuppressWarnings("DataFlowIssue")
         @Override
         public void merge(Map.Container<K, V> container) {
             Engine.assume(container instanceof IdentityMapContainer);

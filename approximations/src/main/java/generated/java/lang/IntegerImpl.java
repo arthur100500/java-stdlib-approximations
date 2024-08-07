@@ -2,7 +2,6 @@ package generated.java.lang;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.lang.Class;
 import java.lang.Comparable;
 import java.lang.NullPointerException;
 import java.lang.Object;
@@ -22,8 +21,6 @@ public final class IntegerImpl implements Comparable<IntegerImpl>, Serializable 
     public static final int MIN_VALUE = -2147483648;
 
     public static final int MAX_VALUE = 2147483647;
-
-    public static final Class<?> TYPE = PrimitiveTypeUtils.getPrimitiveClass("int");
 
     public static final int SIZE = 32;
 
@@ -218,6 +215,7 @@ public final class IntegerImpl implements Comparable<IntegerImpl>, Serializable 
         return ((long) x) & 4294967295L;
     }
 
+    // TODO: intern values from -128 to 128
     public static IntegerImpl valueOf(int i) {
         return new IntegerImpl(i);
     }

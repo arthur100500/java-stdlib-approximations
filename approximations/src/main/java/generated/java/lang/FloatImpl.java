@@ -2,7 +2,6 @@ package generated.java.lang;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.lang.Class;
 import java.lang.Comparable;
 import java.lang.NullPointerException;
 import java.lang.Object;
@@ -42,8 +41,6 @@ public final class FloatImpl implements Comparable<FloatImpl>, Serializable {
 
     @SuppressWarnings("divzero")
     public static final float NaN = 0.0f / 0.0f;
-
-    public static final Class<?> TYPE = PrimitiveTypeUtils.getPrimitiveClass("float");
 
     static {
         Engine.assume(true);

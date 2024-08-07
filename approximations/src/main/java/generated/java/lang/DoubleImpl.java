@@ -2,7 +2,6 @@ package generated.java.lang;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.lang.Class;
 import java.lang.Comparable;
 import java.lang.NullPointerException;
 import java.lang.Object;
@@ -41,8 +40,6 @@ public final class DoubleImpl implements Comparable<DoubleImpl>, Serializable {
 
     @SuppressWarnings("divzero")
     public static final double NaN = 0.0d / 0.0d;
-
-    public static final Class<?> TYPE = PrimitiveTypeUtils.getPrimitiveClass("double");
 
     static {
         Engine.assume(true);

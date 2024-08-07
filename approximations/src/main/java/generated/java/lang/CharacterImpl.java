@@ -2,7 +2,6 @@ package generated.java.lang;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.lang.Class;
 
 import org.jacodb.approximation.annotation.Approximate;
 import org.usvm.api.Engine;
@@ -17,8 +16,6 @@ public final class CharacterImpl implements Serializable {
     public static final int BYTES = 2;
 
     public static final int SIZE = 16;
-
-    public static final Class<?> TYPE = PrimitiveTypeUtils.getPrimitiveClass("char");
 
     public static final byte COMBINING_SPACING_MARK = 8;
 

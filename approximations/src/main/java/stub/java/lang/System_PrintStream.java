@@ -18,15 +18,15 @@ public final class System_PrintStream extends PrintStream {
         throw new LinkageError();
     }
 
-    public PrintStream append(CharSequence csq) {
+    public System_PrintStream append(CharSequence csq) {
         throw new LinkageError();
     }
 
-    public PrintStream append(CharSequence csq, int start, int end) {
+    public System_PrintStream append(CharSequence csq, int start, int end) {
         throw new LinkageError();
     }
 
-    public PrintStream append(char c) {
+    public System_PrintStream append(char c) {
         throw new LinkageError();
     }
 
@@ -42,11 +42,11 @@ public final class System_PrintStream extends PrintStream {
         throw new LinkageError();
     }
 
-    public PrintStream format(Locale l, @NotNull String format, Object... args) {
+    public System_PrintStream format(Locale l, @NotNull String format, Object... args) {
         throw new LinkageError();
     }
 
-    public PrintStream format(@NotNull String format, Object... args) {
+    public System_PrintStream format(@NotNull String format, Object... args) {
         throw new LinkageError();
     }
 
@@ -86,11 +86,11 @@ public final class System_PrintStream extends PrintStream {
         throw new LinkageError();
     }
 
-    public PrintStream printf(Locale l, @NotNull String format, Object... args) {
+    public System_PrintStream printf(Locale l, @NotNull String format, Object... args) {
         throw new LinkageError();
     }
 
-    public PrintStream printf(@NotNull String format, Object... args) {
+    public System_PrintStream printf(@NotNull String format, Object... args) {
         throw new LinkageError();
     }
 

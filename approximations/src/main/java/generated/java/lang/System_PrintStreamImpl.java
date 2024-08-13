@@ -15,14 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import stub.java.lang.System_PrintStream;
 
 @Approximate(System_PrintStream.class)
-public final class System_PrintStreamImpl extends PrintStream {
+public final class System_PrintStreamImpl {
 
     public boolean closed;
 
     public boolean error;
 
     public System_PrintStreamImpl(boolean closed, boolean error) {
-        super(new VoidOutputStreamImpl(closed));
         this.closed = closed;
         this.error = error;
     }
@@ -31,12 +30,13 @@ public final class System_PrintStreamImpl extends PrintStream {
         if (this.closed)
             this.error = true;
     }
-    public PrintStream append(CharSequence csq) {
+
+    public System_PrintStreamImpl append(CharSequence csq) {
         _checkClosed();
         return this;
     }
 
-    public PrintStream append(CharSequence csq, int start, int end) {
+    public System_PrintStreamImpl append(CharSequence csq, int start, int end) {
         if (csq == null)
             csq = "null";
         int size = csq.length();
@@ -47,7 +47,7 @@ public final class System_PrintStreamImpl extends PrintStream {
         return this;
     }
 
-    public PrintStream append(char c) {
+    public System_PrintStreamImpl append(char c) {
         _checkClosed();
         return this;
     }
@@ -65,7 +65,7 @@ public final class System_PrintStreamImpl extends PrintStream {
     }
 
     @SuppressWarnings("ConstantValue")
-    public PrintStream format(Locale l, @NotNull String format, Object... args) {
+    public System_PrintStreamImpl format(Locale l, @NotNull String format, Object... args) {
         if (format == null)
             throw new NullPointerException();
         _checkClosed();
@@ -74,7 +74,7 @@ public final class System_PrintStreamImpl extends PrintStream {
     }
 
     @SuppressWarnings("ConstantValue")
-    public PrintStream format(@NotNull String format, Object... args) {
+    public System_PrintStreamImpl format(@NotNull String format, Object... args) {
         if (format == null)
             throw new NullPointerException();
         _checkClosed();
@@ -122,7 +122,7 @@ public final class System_PrintStreamImpl extends PrintStream {
     }
 
     @SuppressWarnings("ConstantValue")
-    public PrintStream printf(Locale l, @NotNull String format, Object... args) {
+    public System_PrintStreamImpl printf(Locale l, @NotNull String format, Object... args) {
         if (l == null || format == null || args == null)
             throw new NullPointerException();
         _checkClosed();
@@ -131,7 +131,7 @@ public final class System_PrintStreamImpl extends PrintStream {
     }
 
     @SuppressWarnings("ConstantValue")
-    public PrintStream printf(@NotNull String format, Object... args) {
+    public System_PrintStreamImpl printf(@NotNull String format, Object... args) {
         if (format == null || args == null)
             throw new NullPointerException();
         _checkClosed();

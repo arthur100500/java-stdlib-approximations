@@ -35,7 +35,7 @@ public class OptionalDouble_Decoder implements ObjectDecoder {
 
                 if ("value".equals(name)) {
                     f_value = f;
-                } else if ("present".equals(name)) {
+                } else if ("isPresent".equals(name)) {
                     f_present = f;
                 }
 

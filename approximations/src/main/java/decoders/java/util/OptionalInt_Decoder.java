@@ -36,7 +36,7 @@ public class OptionalInt_Decoder implements ObjectDecoder {
                 // NOTE: this is an example on how to join discovery process for multiple targets
                 if ("value".equals(name)) {
                     f_value = f;
-                } else if ("present".equals(name)) {
+                } else if ("isPresent".equals(name)) {
                     f_present = f;
                 }
                 if (f_value != null && f_present != null)

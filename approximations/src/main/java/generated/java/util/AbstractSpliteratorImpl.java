@@ -63,7 +63,7 @@ public abstract class AbstractSpliteratorImpl<E> implements Spliterator<E> {
     public abstract boolean tryAdvance(Consumer<? super E> userAction);
 
     public AbstractSpliteratorImpl<E> trySplit() {
-        int hi = this.fence;
+        int hi = _getFence();
         int lo = this.index;
         int mid = (lo + hi) >>> 1;
         if (lo >= mid)

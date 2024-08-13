@@ -66,7 +66,7 @@ public class AtomicBooleanImpl implements Serializable {
     }
 
     public final boolean get() {
-        return this.value == TRUE;
+        return this.value != FALSE;
     }
 
     public final boolean getAcquire() {

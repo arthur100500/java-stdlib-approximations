@@ -28,7 +28,7 @@ public final class SystemImpl {
     private static Properties props = null;
 
     @SuppressWarnings("FieldMayBeFinal")
-    private static volatile Console console = null;
+    private static Console console = null;
 
     public static InputStream in = null;
 
@@ -117,16 +117,19 @@ public final class SystemImpl {
         props = null;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     private static void initPhase1() {
         _initProperties();
         in = new SymbolicInputStreamImpl(1000, false, -1, null, false, 0, -1, 0);
-        out = new System_PrintStreamImpl(false, false);
-        err = new System_PrintStreamImpl(false, false);
+        out = (PrintStream) (Object) new System_PrintStreamImpl(false, false);
+        err = (PrintStream) (Object) new System_PrintStreamImpl(false, false);
         VM.initLevel(1);
     }
 
-    private static void initPhase2() {
+    @SuppressWarnings("UnusedReturnValue")
+    private static int initPhase2() {
         VM.initLevel(2);
+        return 0;
     }
 
     private static void initPhase3() {

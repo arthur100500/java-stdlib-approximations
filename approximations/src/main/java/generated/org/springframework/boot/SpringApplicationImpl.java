@@ -29,6 +29,8 @@ public class SpringApplicationImpl {
         return new HashMap<>();
     }
 
+    private void internalLog(String message) { }
+
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         startAnalysis();
         Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
@@ -41,8 +43,11 @@ public class SpringApplicationImpl {
         Map<String, Map<String, List<Object>>> allPaths = allControllerPaths();
         try {
             for (String controllerName : allPaths.keySet()) {
+                internalLog("[USVM] starting to analyze controller " + controllerName);
                 Map<String, List<Object>> paths = allPaths.get(controllerName);
                 for (String path : paths.keySet()) {
+                    internalLog("[USVM] starting to analyze path " + path);
+
                     List<Object> properties = paths.get(path);
                     String kind = (String) properties.get(0);
                     Integer paramCount = (Integer) properties.get(1);
@@ -57,7 +62,10 @@ public class SpringApplicationImpl {
                         mockMvc.perform(delete(path, pathArgs));
                     if (kind.equals("patch"))
                         mockMvc.perform(patch(path, pathArgs));
+
+                    internalLog("[USVM] end of path analysis " + path);
                 }
+                internalLog("[USVM] end of controller analysis " + controllerName);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -67,8 +67,8 @@ public class SpringApplicationImpl {
                 }
                 internalLog("[USVM] end of controller analysis " + controllerName);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Throwable e) {
+            internalLog("[USVM] analysis finished with exception");
         }
     }
 

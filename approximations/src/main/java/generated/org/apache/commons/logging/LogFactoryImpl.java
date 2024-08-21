@@ -1,4 +1,4 @@
-package generated.org.springframework.boot;
+package generated.org.apache.commons.logging;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.NoOpLog;

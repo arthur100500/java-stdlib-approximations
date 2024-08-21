@@ -47,6 +47,7 @@ public class Map_Contents_IteratorImpl<K, V, Content> extends AbstractIteratorIm
     }
 
     private boolean _isEmpty() {
+        // TODO: make via 'contains(unseen.anyKey) == false'
         return this.unseen.size() == 0;
     }
 

@@ -26,6 +26,20 @@ public class StringImpl implements Serializable {
         this.length = length;
     }
 
+//    @SuppressWarnings("ConstantValue")
+//    public StringImpl(char[] value, int offset, int count) {
+//        if (value == null)
+//            throw new NullPointerException();
+//
+//        int size = value.length;
+//        if (length < 0 || offset < 0 || size < 0 || size > length - offset)
+//            throw new IndexOutOfBoundsException();
+//
+//        char[] newValue = new char[count];
+//        LibSLRuntime.ArrayActions.copy(value, offset, newValue, 0, count);
+//
+//    }
+
     public StringImpl() {
         this(new byte[0], 0);
     }

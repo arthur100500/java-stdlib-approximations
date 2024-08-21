@@ -66,7 +66,7 @@ public class LongStreamImpl extends BaseStreamImpl<Long> implements LongStream {
     }
 
     private LongStreamImpl _copy(long[] storage) {
-        return new LongStreamImpl(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new LongStreamImpl(storage, _getCloseHandlers(), isParallel, false);
     }
 
     private LongStreamImpl _copy() {

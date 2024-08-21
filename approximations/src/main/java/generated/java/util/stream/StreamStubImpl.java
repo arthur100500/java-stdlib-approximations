@@ -78,7 +78,7 @@ public class StreamStubImpl<E> extends BaseStreamImpl<E> implements Stream<E> {
     }
 
     private <T> StreamStubImpl<T> _copy(T[] storage) {
-        return new StreamStubImpl<>(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new StreamStubImpl<>(storage, _getCloseHandlers(), isParallel, false);
     }
 
     private StreamStubImpl<E> _copy() {

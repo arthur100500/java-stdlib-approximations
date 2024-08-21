@@ -66,7 +66,7 @@ public class IntStreamImpl extends BaseStreamImpl<Integer> implements IntStream 
     }
 
     private IntStreamImpl _copy(int[] storage) {
-        return new IntStreamImpl(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new IntStreamImpl(storage, _getCloseHandlers(), isParallel, false);
     }
 
     private IntStreamImpl _copy() {

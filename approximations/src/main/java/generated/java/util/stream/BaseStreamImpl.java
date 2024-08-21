@@ -39,19 +39,19 @@ public abstract class BaseStreamImpl<E> {
     }
 
     protected <T> StreamStubImpl<T> _copyToObjStream(T[] storage) {
-        return new StreamStubImpl<>(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new StreamStubImpl<>(storage, _getCloseHandlers(), isParallel, false);
     }
 
     protected IntStreamImpl _copyToIntStream(int[] storage) {
-        return new IntStreamImpl(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new IntStreamImpl(storage, _getCloseHandlers(), isParallel, false);
     }
 
     protected LongStreamImpl _copyToLongStream(long[] storage) {
-        return new LongStreamImpl(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new LongStreamImpl(storage, _getCloseHandlers(), isParallel, false);
     }
 
     protected DoubleStreamImpl _copyToDoubleStream(double[] storage) {
-        return new DoubleStreamImpl(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new DoubleStreamImpl(storage, _getCloseHandlers(), isParallel, false);
     }
 
     public void evaluate() {

@@ -68,7 +68,7 @@ public class DoubleStreamImpl extends BaseStreamImpl<Double> implements DoubleSt
     }
 
     private DoubleStreamImpl _copy(double[] storage) {
-        return new DoubleStreamImpl(storage, _getCloseHandlers(), isParallel, linkedOrConsumed);
+        return new DoubleStreamImpl(storage, _getCloseHandlers(), isParallel, false);
     }
 
     private DoubleStreamImpl _copy() {

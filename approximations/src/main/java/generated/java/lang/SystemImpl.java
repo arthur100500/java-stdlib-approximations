@@ -12,6 +12,7 @@ import java.lang.Object;
 import java.lang.SecurityException;
 import java.lang.String;
 import java.lang.UnsatisfiedLinkError;
+import java.util.Map;
 import java.util.Properties;
 import jdk.internal.misc.VM;
 import org.jacodb.approximation.annotation.Approximate;
@@ -50,71 +51,89 @@ public final class SystemImpl {
 
     private SystemImpl() { }
 
+    private static void _initProperty(LibSLRuntime.Map<String, String> pm, Properties properties, String key, String value) {
+        pm.set(key, value);
+        switch (key) {
+            // Do not add private system properties to the Properties
+            case "sun.nio.MaxDirectMemorySize":
+            case "sun.nio.PageAlignDirectMemory":
+                // used by java.lang.Integer.IntegerCache
+            case "java.lang.Integer.IntegerCache.high":
+                // used by sun.launcher.LauncherHelper
+            case "sun.java.launcher.diag":
+                // used by jdk.internal.loader.ClassLoaders
+            case "jdk.boot.class.path.append":
+                break;
+            default:
+                properties.put(key, value);
+        }
+    }
+
     private static void _initProperties() {
         LibSLRuntime.Map<String, String> pm = propsMap;
+        props = new Properties();
         int javaVersion = 8;
         String userName = "Admin";
-        pm.set("file.encoding", "Cp1251");
-        pm.set("sun.io.unicode.encoding", "UnicodeLittle");
-        pm.set("sun.jnu.encoding", "Cp1251");
-        pm.set("sun.stderr.encoding", "cp866");
-        pm.set("sun.stdout.encoding", "cp866");
+        _initProperty(pm, props,"file.encoding", "Cp1251");
+        _initProperty(pm, props,"sun.io.unicode.encoding", "UnicodeLittle");
+        _initProperty(pm, props,"sun.jnu.encoding", "Cp1251");
+        _initProperty(pm, props,"sun.stderr.encoding", "cp866");
+        _initProperty(pm, props,"sun.stdout.encoding", "cp866");
         String[] versionStrings = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
         String versionString = versionStrings[javaVersion];
-        pm.set("java.specification.name", "Java Platform API Specification");
-        pm.set("java.specification.vendor", "Oracle Corporation");
-        pm.set("java.specification.version", versionString);
-        pm.set("java.vm.info", "mixed mode");
-        pm.set("java.vm.name", "OpenJDK 64-Bit Server VM");
-        pm.set("java.vm.specification.name", "Java Virtual Machine Specification");
-        pm.set("java.vm.specification.vendor", "Oracle Corporation");
-        pm.set("java.vm.specification.version", versionString);
-        pm.set("java.vm.vendor", "Eclipse Adoptium");
-        pm.set("java.vm.version", versionString.concat(".0.362+9"));
-        pm.set("java.library.path", "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.362.9-hotspot\\bin;C:\\Windows\\Sun\\Java\\bin;C:\\Windows\\system32;.");
-        pm.set("java.home", "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.362.9-hotspot");
-        pm.set("sun.boot.library.path", "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.362.9-hotspot\\bin");
-        pm.set("java.io.tmpdir", "T:\\Temp\\");
-        pm.set("java.class.path", ".");
+        _initProperty(pm, props,"java.specification.name", "Java Platform API Specification");
+        _initProperty(pm, props,"java.specification.vendor", "Oracle Corporation");
+        _initProperty(pm, props,"java.specification.version", versionString);
+        _initProperty(pm, props,"java.vm.info", "mixed mode");
+        _initProperty(pm, props,"java.vm.name", "OpenJDK 64-Bit Server VM");
+        _initProperty(pm, props,"java.vm.specification.name", "Java Virtual Machine Specification");
+        _initProperty(pm, props,"java.vm.specification.vendor", "Oracle Corporation");
+        _initProperty(pm, props,"java.vm.specification.version", versionString);
+        _initProperty(pm, props,"java.vm.vendor", "Eclipse Adoptium");
+        _initProperty(pm, props,"java.vm.version", versionString.concat(".0.362+9"));
+        _initProperty(pm, props,"java.library.path", "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.362.9-hotspot\\bin;C:\\Windows\\Sun\\Java\\bin;C:\\Windows\\system32;.");
+        _initProperty(pm, props,"java.home", "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.362.9-hotspot");
+        _initProperty(pm, props,"sun.boot.library.path", "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.362.9-hotspot\\bin");
+        _initProperty(pm, props,"java.io.tmpdir", "T:\\Temp\\");
+        _initProperty(pm, props,"java.class.path", ".");
         if (LibSLGlobals.SYSTEM_IS_WINDOWS) {
-            pm.set("file.separator", "\\");
-            pm.set("line.separator", "\r\n");
-            pm.set("path.separator", ";");
+            _initProperty(pm, props, "file.separator", "\\");
+            _initProperty(pm, props,"line.separator", "\r\n");
+            _initProperty(pm, props, "path.separator", ";");
         } else {
-            pm.set("file.separator", "/");
-            pm.set("line.separator", "\n");
-            pm.set("path.separator", ":");
+            _initProperty(pm, props,"file.separator", "/");
+            _initProperty(pm, props,"line.separator", "\n");
+            _initProperty(pm, props,"path.separator", ":");
         }
-        pm.set("user.country", "RU");
-        pm.set("user.country.format", "US");
-        pm.set("user.language", "ru");
+        _initProperty(pm, props,"user.country", "RU");
+        _initProperty(pm, props,"user.country.format", "US");
+        _initProperty(pm, props,"user.language", "ru");
         String[] bytecodeVersions = { "?", "?", "?", "?", "?", "49.0", "50.0", "51.0", "52.0", "53.0", "54.0", "55.0", "?", "?", "?", "?" };
-        pm.set("java.class.version", bytecodeVersions[javaVersion]);
-        pm.set("os.arch", "amd64");
-        pm.set("os.name", "Windows 10");
-        pm.set("os.version", "10.0");
-        pm.set("sun.arch.data.model", "64");
-        pm.set("sun.cpu.endian", "little");
-        pm.set("sun.cpu.isalist", "amd64");
-        pm.set("sun.desktop", "windows");
-        pm.set("user.dir", "D:\\Company\\Prod\\Service");
-        pm.set("user.home", "C:\\Users\\".concat(userName));
-        pm.set("user.name", userName);
-        pm.set("user.script", "");
-        pm.set("user.timezone", "");
-        pm.set("user.variant", "");
-        pm.set("sun.java.command", "org.example.MainClass");
-        pm.set("awt.toolkit", "sun.awt.windows.WToolkit");
-        pm.set("java.awt.graphicsenv", "sun.awt.Win32GraphicsEnvironment");
-        pm.set("java.awt.printerjob", "sun.awt.windows.WPrinterJob");
-        pm.set("sun.java.launcher", "SUN_STANDARD");
-        pm.set("sun.management.compiler", "HotSpot 64-Bit Tiered Compilers");
-        pm.set("sun.nio.MaxDirectMemorySize", "-1");
-        pm.set("sun.os.patch.level", "");
-        pm.set("java.vm.compressedOopsMode", "Zero based");
-        pm.set("jdk.boot.class.path.append", "");
-        pm.set("jdk.debug", "release");
-        props = null;
+        _initProperty(pm, props,"java.class.version", bytecodeVersions[javaVersion]);
+        _initProperty(pm, props,"os.arch", "amd64");
+        _initProperty(pm, props,"os.name", "Windows 10");
+        _initProperty(pm, props,"os.version", "10.0");
+        _initProperty(pm, props,"sun.arch.data.model", "64");
+        _initProperty(pm, props,"sun.cpu.endian", "little");
+        _initProperty(pm, props,"sun.cpu.isalist", "amd64");
+        _initProperty(pm, props,"sun.desktop", "windows");
+        _initProperty(pm, props,"user.dir", "D:\\Company\\Prod\\Service");
+        _initProperty(pm, props,"user.home", "C:\\Users\\".concat(userName));
+        _initProperty(pm, props,"user.name", userName);
+        _initProperty(pm, props,"user.script", "");
+        _initProperty(pm, props,"user.timezone", "");
+        _initProperty(pm, props,"user.variant", "");
+        _initProperty(pm, props,"sun.java.command", "org.example.MainClass");
+        _initProperty(pm, props,"awt.toolkit", "sun.awt.windows.WToolkit");
+        _initProperty(pm, props,"java.awt.graphicsenv", "sun.awt.Win32GraphicsEnvironment");
+        _initProperty(pm, props,"java.awt.printerjob", "sun.awt.windows.WPrinterJob");
+        _initProperty(pm, props,"sun.java.launcher", "SUN_STANDARD");
+        _initProperty(pm, props,"sun.management.compiler", "HotSpot 64-Bit Tiered Compilers");
+        _initProperty(pm, props,"sun.nio.MaxDirectMemorySize", "-1");
+        _initProperty(pm, props,"sun.os.patch.level", "");
+        _initProperty(pm, props,"java.vm.compressedOopsMode", "Zero based");
+        _initProperty(pm, props,"jdk.boot.class.path.append", "");
+        _initProperty(pm, props,"jdk.debug", "release");
     }
 
     @SuppressWarnings("DataFlowIssue")

@@ -17,13 +17,18 @@ public class StringImpl implements Serializable {
 
     private static final int STRING_LENGTH_MAX = 50;
 
-    public byte[] value;
+    static final byte UTF16  = 1;
 
-    public int length;
+    // Enforce coder == UTF16
+    static final boolean COMPACT_STRINGS = false;
 
-    public StringImpl(byte[] value, int length) {
+    private final byte[] value;
+
+    private final byte coder;
+
+    public StringImpl(byte[] value, byte coder) {
         this.value = value;
-        this.length = length;
+        this.coder = coder;
     }
 
 //    @SuppressWarnings("ConstantValue")
@@ -40,17 +45,17 @@ public class StringImpl implements Serializable {
 //    }
 
     public StringImpl() {
-        this(new byte[0], 0);
+        this(new byte[0], UTF16);
     }
 
     public StringImpl(StringImpl original) {
-        this(original.value, original.length);
+        this(original.value, original.coder);
     }
 
     public StringImpl(byte[] bytes) {
         int len = bytes.length;
-        this.length = len;
         this.value = new byte[len];
+        this.coder = UTF16;
         LibSLRuntime.ArrayActions.copy(bytes, 0, this.value, 0, len);
     }
 
@@ -106,24 +111,22 @@ public class StringImpl implements Serializable {
     public StringImpl concat(StringImpl str) {
         Engine.assume(this.value != null);
         Engine.assume(this.value.length <= STRING_LENGTH_MAX);
-        Engine.assume(this.length == this.value.length);
         byte[] otherVal = str.value;
         int otherLen = otherVal.length;
         if (otherLen == 0)
             return this;
 
-        int newLength = this.length + otherLen;
+        int newLength = this.value.length + otherLen;
         byte[] newValue = new byte[newLength];
-        LibSLRuntime.ArrayActions.copy(this.value, 0, newValue, 0, this.length);
-        LibSLRuntime.ArrayActions.copy(otherVal, 0, newValue, this.length, otherLen);
-        return new StringImpl(newValue, newLength);
+        LibSLRuntime.ArrayActions.copy(this.value, 0, newValue, 0, this.value.length);
+        LibSLRuntime.ArrayActions.copy(otherVal, 0, newValue, this.value.length, otherLen);
+        return new StringImpl(newValue, UTF16);
     }
 
     @SuppressWarnings("DataFlowIssue")
     public byte[] getBytes() {
         Engine.assume(this.value != null);
         Engine.assume(this.value.length <= STRING_LENGTH_MAX);
-        Engine.assume(this.length == this.value.length);
         return this.value;
     }
 
@@ -131,22 +134,12 @@ public class StringImpl implements Serializable {
     public void getBytes(int srcBegin, int srcEnd, byte[] dst, int dstBegin) {
         if (srcBegin < 0)
             throw new StringIndexOutOfBoundsException(srcBegin);
-        if (this.length < srcEnd)
+        if (this.value.length < srcEnd)
             throw new StringIndexOutOfBoundsException(srcEnd);
         int count = srcEnd - srcBegin;
         if (count < 0)
             throw new StringIndexOutOfBoundsException(count);
-        Engine.assume(this.value != null);
         Engine.assume(this.value.length <= STRING_LENGTH_MAX);
-        Engine.assume(this.length == this.value.length);
         LibSLRuntime.ArrayActions.copy(this.value, srcBegin, dst, dstBegin, count);
-    }
-
-    public boolean isEmpty() {
-        return this.length == 0;
-    }
-
-    public int length() {
-        return this.length;
     }
 }

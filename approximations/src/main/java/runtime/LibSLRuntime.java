@@ -234,7 +234,7 @@ public final class LibSLRuntime {
     }
 
     public static String toString(final char v) {
-        return String.valueOf(v);
+        return new String(new char[] { v });
     }
 
     // TODO: do we need more variants for other primitive array types?

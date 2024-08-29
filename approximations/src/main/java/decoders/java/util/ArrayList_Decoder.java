@@ -46,7 +46,6 @@ public class ArrayList_Decoder implements ObjectDecoder {
 
                         List<JcParameter> params = m.getParameters();
                         if (params.size() != 1) continue;
-                        if (!"java.lang.Object".equals(params.get(0).getType().getTypeName())) continue;
 
                         cached_ArrayList_add = m_add = m;
                     }
@@ -60,6 +59,16 @@ public class ArrayList_Decoder implements ObjectDecoder {
         return decoder.invokeMethod(m_ctor, (List<T>) Collections.EMPTY_LIST);
     }
 
+    private static List<JcField> getAllFields(JcClassOrInterface clazz) {
+        JcClassOrInterface superclass = clazz.getSuperClass();
+        if (superclass == null) {
+            return clazz.getDeclaredFields();
+        }
+        List<JcField> declaredFields = clazz.getDeclaredFields();
+        declaredFields.addAll(getAllFields(superclass));
+        return declaredFields;
+    }
+
     @Override
     public <T> void initializeInstance(final JcClassOrInterface approx,
                                        final ObjectData<T> approxData,
@@ -68,7 +77,7 @@ public class ArrayList_Decoder implements ObjectDecoder {
         JcField f_storage = cached_ArrayList_storage;
         // TODO: add synchronization if needed
         if (f_storage == null) {
-            final List<JcField> fields = approx.getDeclaredFields();
+            final List<JcField> fields = getAllFields(approx);
             for (int i = 0, c = fields.size(); i < c; i++) {
                 JcField f = fields.get(i);
                 if ("storage".equals(f.getName())) {

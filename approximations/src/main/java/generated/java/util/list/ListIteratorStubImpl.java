@@ -121,6 +121,7 @@ public class ListIteratorStubImpl<E> extends AbstractIteratorImpl<E> implements 
         AbstractListImpl<E> list = _getList();
         SymbolicList<E> storage = list._getStorage();
         list.modCount++;
+        // TODO: use ArrayList.add(e)
         storage.insert(this.cursor, e);
         this.cursor++;
         this.lastRet = -1;

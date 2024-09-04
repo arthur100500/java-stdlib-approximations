@@ -37,7 +37,6 @@ public class StringImpl implements Serializable {
 //
 //        char[] newValue = new char[count];
 //        LibSLRuntime.ArrayActions.copy(value, offset, newValue, 0, count);
-//
 //    }
 
     public StringImpl() {

@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import runtime.LibSLRuntime;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -15,6 +16,10 @@ public class ConcurrentReferenceHashMapImpl<K, V> extends AbstractMapImpl<K, V> 
 
     public ConcurrentReferenceHashMapImpl() {
         super(true);
+    }
+
+    public ConcurrentReferenceHashMapImpl(Map<? extends K, ? extends V> m) {
+        super(true, m);
     }
 
     public ConcurrentReferenceHashMapImpl(int initialCapacity) {

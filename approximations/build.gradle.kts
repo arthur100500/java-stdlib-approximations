@@ -10,7 +10,7 @@ repositories {
 }
 
 private val jacodbPackage = "com.github.UnitTestBot.jacodb"
-private val jacodbVersion = "00164e304b" // jacodb neo branch
+private val jacodbVersion = "1abfc75c71" // jacodb neo branch
 
 dependencies {
     compileOnly("$jacodbPackage:jacodb-api-jvm:$jacodbVersion")

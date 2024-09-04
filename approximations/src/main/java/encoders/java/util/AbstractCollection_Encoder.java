@@ -4,14 +4,13 @@ import generated.java.util.list.ArrayListImpl;
 import org.usvm.api.encoder.EncoderFor;
 import org.usvm.api.encoder.ObjectEncoder;
 
-import java.util.ArrayList;
+import java.util.AbstractCollection;
 
-@EncoderFor(ArrayList.class)
-public class ArrayList_Encoder implements ObjectEncoder {
+@EncoderFor(AbstractCollection.class)
+public class AbstractCollection_Encoder implements ObjectEncoder {
 
     @Override
     public Object encode(Object object) {
-        ArrayList<?> list = (ArrayList<?>) object;
-        return new ArrayListImpl<>(list);
+        return new ArrayListImpl<>();
     }
 }

@@ -35,6 +35,44 @@ public class StringImpl implements Serializable {
         return COMPACT_STRINGS ? LATIN1 : UTF16;
     }
 
+    private int _charPosToBytePos(int charPos) {
+        return charPos << coder;
+    }
+
+    private int _bytePosToCharPos(int charPos) {
+        return charPos >> coder;
+    }
+
+    private static void _checkOffset(int offset, int length) {
+        if (offset < 0 || offset >= length)
+            throw new IndexOutOfBoundsException();
+    }
+
+    public static byte[] _charToBytes(char value) {
+        if (COMPACT_STRINGS) {
+            byte[] bytes = new byte[1];
+            Engine.assume(value <= 0xFF);
+            bytes[0] = (byte) value;
+            return bytes;
+        }
+
+        byte[] bytes = new byte[2];
+        bytes[0] = (byte) value;
+        bytes[1] = (byte) (value >> 8);
+        return bytes;
+    }
+
+    private static char _charFrom2Bytes(byte fst, byte snd) {
+        return (char) (((char) fst) | (((char) snd) << 8));
+    }
+
+    public static char _bytesToChar(byte[] bytes, int bytePos) {
+        if (COMPACT_STRINGS)
+            return (char) bytes[bytePos];
+
+        return _charFrom2Bytes(bytes[bytePos], bytes[bytePos + 1]);
+    }
+
     public static void _addCharToBytes(byte[] bytes, int index, char value) {
         if (COMPACT_STRINGS) {
             Engine.assume(value <= 0xFF);
@@ -77,7 +115,9 @@ public class StringImpl implements Serializable {
         } else {
             int byteIndex = 0;
             for (int i = 0; i < chars.length; i++) {
-                char c = (char) (((char) bytes[byteIndex++]) | (((char) bytes[byteIndex++]) << 8));
+                char c = _charFrom2Bytes(bytes[byteIndex], bytes[byteIndex + 1]);
+                chars[i] = c;
+                byteIndex += 2;
             }
         }
 
@@ -105,14 +145,15 @@ public class StringImpl implements Serializable {
         LibSLRuntime.ArrayActions.copy(bytes, 0, this.value, 0, len);
     }
 
-    public static java.lang.String copyValueOf(char[] data) {
-        return LibSLRuntime.toString(data);
+    public static StringImpl copyValueOf(char[] data) {
+        byte[] bytes = _getBytes(data);
+        return new StringImpl(bytes);
     }
 
-    public static java.lang.String copyValueOf(char[] data, int offset, int count) {
+    public static StringImpl copyValueOf(char[] data, int offset, int count) {
         char[] segment = new char[count];
         LibSLRuntime.ArrayActions.copy(data, offset, segment, 0, count);
-        return LibSLRuntime.toString(segment);
+        return copyValueOf(segment);
     }
 
     public static java.lang.String valueOf(Object x) {
@@ -123,18 +164,18 @@ public class StringImpl implements Serializable {
         return LibSLRuntime.toString(x);
     }
 
-    public static java.lang.String valueOf(char x) {
-        return LibSLRuntime.toString(x);
+    public static StringImpl valueOf(char x) {
+        byte[] bytes = _charToBytes(x);
+        return new StringImpl(bytes);
     }
 
-    public static java.lang.String valueOf(char[] data) {
-        return LibSLRuntime.toString(data);
+    public static StringImpl valueOf(char[] data) {
+        byte[] bytes = _getBytes(data);
+        return new StringImpl(bytes);
     }
 
-    public static java.lang.String valueOf(char[] data, int offset, int count) {
-        char[] segment = new char[count];
-        LibSLRuntime.ArrayActions.copy(data, offset, segment, 0, count);
-        return LibSLRuntime.toString(segment);
+    public static StringImpl valueOf(char[] data, int offset, int count) {
+        return copyValueOf(data, offset, count);
     }
 
     public static java.lang.String valueOf(double x) {
@@ -154,14 +195,38 @@ public class StringImpl implements Serializable {
     }
 
     @SuppressWarnings("DataFlowIssue")
+    private void _assumeInvariants(StringImpl obj) {
+        Engine.assume(obj.coder == _currentCoder());
+        Engine.assume(obj.value != null);
+        Engine.assume((obj.value.length >> obj.coder) <= STRING_LENGTH_MAX);
+    }
+
     private void _assumeInvariants() {
-        Engine.assume(this.value != null);
-        Engine.assume(this.value.length <= STRING_LENGTH_MAX);
-        Engine.assume(this.coder == _currentCoder());
+        _assumeInvariants(this);
+    }
+
+    byte coder() {
+        _assumeInvariants();
+        return coder;
+    }
+
+    public int length() {
+        _assumeInvariants();
+        return value.length >> coder;
+    }
+
+    public char charAt(int index) {
+        _assumeInvariants();
+
+        int byteIndex = _charPosToBytePos(index);
+        _checkOffset(byteIndex, this.value.length);
+
+        return _bytesToChar(this.value, byteIndex);
     }
 
     public StringImpl concat(StringImpl str) {
         _assumeInvariants();
+        _assumeInvariants(str);
 
         byte[] otherVal = str.value;
         int otherLen = otherVal.length;
@@ -172,24 +237,31 @@ public class StringImpl implements Serializable {
         byte[] newValue = new byte[newLength];
         LibSLRuntime.ArrayActions.copy(this.value, 0, newValue, 0, this.value.length);
         LibSLRuntime.ArrayActions.copy(otherVal, 0, newValue, this.value.length, otherLen);
-        return new StringImpl(newValue, _currentCoder());
+        return new StringImpl(newValue);
     }
 
     public byte[] getBytes() {
         _assumeInvariants();
-
         return this.value;
     }
 
     public void getBytes(int srcBegin, int srcEnd, byte[] dst, int dstBegin) {
-        if (srcBegin < 0)
+        _assumeInvariants();
+
+        int srcByteBegin = _charPosToBytePos(srcBegin);
+        int srcByteEnd = _charPosToBytePos(srcEnd);
+        int dstByteBegin = _charPosToBytePos(dstBegin);
+
+        if (srcByteBegin < 0)
             throw new StringIndexOutOfBoundsException(srcBegin);
-        if (this.value.length < srcEnd)
+
+        if (this.value.length < srcByteEnd)
             throw new StringIndexOutOfBoundsException(srcEnd);
-        int count = srcEnd - srcBegin;
+
+        int count = srcByteEnd - srcByteBegin;
         if (count < 0)
             throw new StringIndexOutOfBoundsException(count);
-        _assumeInvariants();
-        LibSLRuntime.ArrayActions.copy(this.value, srcBegin, dst, dstBegin, count);
+
+        LibSLRuntime.ArrayActions.copy(this.value, srcByteBegin, dst, dstByteBegin, count);
     }
 }

@@ -388,7 +388,7 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
     }
 
     public StringBuilderImpl appendCodePoint(int codePoint) {
-        // TODO: fix #Approx
+        // TODO: support code points #Approx
         _assumeInvariants();
         int cnt = this.byteCount;
         int len = this.value.length;
@@ -520,6 +520,8 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
             throw new IndexOutOfBoundsException();
         if (len > 0)
             LibSLRuntime.ArrayActions.copy(this.value, srcBegin, dst, dstBegin, len);
+
+        LibSLRuntime.not_implemented();
     }
 
     public char[] getValue() {

@@ -11,7 +11,10 @@ import java.util.Map;
 public class AbstractMap_Entry_Encoder implements ObjectEncoder {
 
     @Override
-    public Object encode(Object list) {
-        return new AbstractMap_EntryImpl<>((Map.Entry<?, ?>) list);
+    public Object encode(Object entry) {
+        if (entry instanceof AbstractMap_Entry)
+            return new AbstractMap_EntryImpl<>(null, null);
+
+        return new AbstractMap_EntryImpl<>((Map.Entry<?, ?>) entry);
     }
 }

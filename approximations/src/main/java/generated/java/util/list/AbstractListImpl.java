@@ -1,7 +1,5 @@
 package generated.java.util.list;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.lang.Comparable;
 import java.lang.IllegalArgumentException;
 import java.lang.IndexOutOfBoundsException;

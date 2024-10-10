@@ -64,6 +64,7 @@ public class SpringApplicationImpl {
                         mockMvc.perform(patch(path, pathArgs));
 
                     internalLog("[USVM] end of path analysis " + path);
+                    endOfPathAnalysis();
                 }
                 internalLog("[USVM] end of controller analysis " + controllerName);
             }
@@ -73,6 +74,8 @@ public class SpringApplicationImpl {
     }
 
     private void startAnalysis() { }
+
+    private void endOfPathAnalysis() { }
 
     public void setListeners(Collection<? extends ApplicationListener<?>> listeners) {
         registerShutdownHook = false;

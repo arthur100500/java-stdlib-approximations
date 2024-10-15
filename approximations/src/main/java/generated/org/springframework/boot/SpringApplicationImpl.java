@@ -29,7 +29,13 @@ public class SpringApplicationImpl {
         return new HashMap<>();
     }
 
-    private void internalLog(String message) { }
+    private void println(String message) { }
+
+    private void internalLog(String... message) {
+        for (String str : message) {
+            println(str);
+        }
+    }
 
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         startAnalysis();
@@ -43,10 +49,10 @@ public class SpringApplicationImpl {
         Map<String, Map<String, List<Object>>> allPaths = allControllerPaths();
         try {
             for (String controllerName : allPaths.keySet()) {
-                internalLog("[USVM] starting to analyze controller " + controllerName);
+                internalLog("[USVM] starting to analyze controller ", controllerName);
                 Map<String, List<Object>> paths = allPaths.get(controllerName);
                 for (String path : paths.keySet()) {
-                    internalLog("[USVM] starting to analyze path " + path);
+                    internalLog("[USVM] starting to analyze path ", path);
 
                     List<Object> properties = paths.get(path);
                     String kind = (String) properties.get(0);
@@ -63,10 +69,10 @@ public class SpringApplicationImpl {
                     if (kind.equals("patch"))
                         mockMvc.perform(patch(path, pathArgs));
 
-                    internalLog("[USVM] end of path analysis " + path);
+                    internalLog("[USVM] end of path analysis ", path);
                     endOfPathAnalysis();
                 }
-                internalLog("[USVM] end of controller analysis " + controllerName);
+                internalLog("[USVM] end of controller analysis ", controllerName);
             }
         } catch (Throwable e) {
             internalLog("[USVM] analysis finished with exception");

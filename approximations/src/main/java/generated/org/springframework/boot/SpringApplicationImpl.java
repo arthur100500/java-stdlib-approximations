@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.usvm.api.Engine;
 
 import java.util.*;
 
@@ -25,20 +26,20 @@ public class SpringApplicationImpl {
 
     private boolean registerShutdownHook = true;
 
-    private Map<String, Map<String, List<Object>>> allControllerPaths() {
+    private Map<String, Map<String, List<Object>>> _allControllerPaths() {
         return new HashMap<>();
     }
 
-    private void println(String message) { }
+    private void _println(String message) { }
 
-    private void internalLog(String... message) {
+    private void _internalLog(String... message) {
         for (String str : message) {
-            println(str);
+            _println(str);
         }
     }
 
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
-        startAnalysis();
+        _startAnalysis();
         Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
         Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
         DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
@@ -46,42 +47,50 @@ public class SpringApplicationImpl {
             builder.addFilter(filter);
         }
         MockMvc mockMvc = builder.build();
-        Map<String, Map<String, List<Object>>> allPaths = allControllerPaths();
-        try {
-            for (String controllerName : allPaths.keySet()) {
-                internalLog("[USVM] starting to analyze controller ", controllerName);
+        Map<String, Map<String, List<Object>>> allPaths = _allControllerPaths();
+        for (String controllerName : allPaths.keySet()) {
+            boolean controllerFound = Engine.makeSymbolicBoolean();
+            if (controllerFound) {
+                _internalLog("[USVM] starting to analyze controller ", controllerName);
                 Map<String, List<Object>> paths = allPaths.get(controllerName);
                 for (String path : paths.keySet()) {
-                    internalLog("[USVM] starting to analyze path ", path);
+                    boolean pathFound = Engine.makeSymbolicBoolean();
+                    if (pathFound) {
+                        _internalLog("[USVM] starting to analyze path ", path);
+                        List<Object> properties = paths.get(path);
+                        String kind = (String) properties.get(0);
+                        Integer paramCount = (Integer) properties.get(1);
+                        Object[] pathArgs = new Object[paramCount];
+                        try {
+                            _startOfPathAnalysis();
+                            if (kind.equals("get"))
+                                mockMvc.perform(get(path, pathArgs));
+                            if (kind.equals("post"))
+                                mockMvc.perform(post(path, pathArgs));
+                            if (kind.equals("put"))
+                                mockMvc.perform(put(path, pathArgs));
+                            if (kind.equals("delete"))
+                                mockMvc.perform(delete(path, pathArgs));
+                            if (kind.equals("patch"))
+                                mockMvc.perform(patch(path, pathArgs));
+                            _internalLog("[USVM] end of path analysis ", path);
+                        } catch (Throwable e) {
+                            _internalLog("[USVM] analysis finished with exception");
+                        }
 
-                    List<Object> properties = paths.get(path);
-                    String kind = (String) properties.get(0);
-                    Integer paramCount = (Integer) properties.get(1);
-                    Object[] pathArgs = new Object[paramCount];
-                    if (kind.equals("get"))
-                        mockMvc.perform(get(path, pathArgs));
-                    if (kind.equals("post"))
-                        mockMvc.perform(post(path, pathArgs));
-                    if (kind.equals("put"))
-                        mockMvc.perform(put(path, pathArgs));
-                    if (kind.equals("delete"))
-                        mockMvc.perform(delete(path, pathArgs));
-                    if (kind.equals("patch"))
-                        mockMvc.perform(patch(path, pathArgs));
-
-                    internalLog("[USVM] end of path analysis ", path);
-                    endOfPathAnalysis();
+                        _endOfPathAnalysis();
+                        return;
+                    }
                 }
-                internalLog("[USVM] end of controller analysis ", controllerName);
             }
-        } catch (Throwable e) {
-            internalLog("[USVM] analysis finished with exception");
         }
     }
 
-    private void startAnalysis() { }
+    private void _startAnalysis() { }
 
-    private void endOfPathAnalysis() { }
+    private void _startOfPathAnalysis() { }
+
+    private void _endOfPathAnalysis() { }
 
     public void setListeners(Collection<? extends ApplicationListener<?>> listeners) {
         registerShutdownHook = false;

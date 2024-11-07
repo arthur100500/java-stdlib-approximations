@@ -61,8 +61,8 @@ public class SpringApplicationImpl {
                         String kind = (String) properties.get(0);
                         Integer paramCount = (Integer) properties.get(1);
                         Object[] pathArgs = new Object[paramCount];
+                        _startOfPathAnalysis();
                         try {
-                            _startOfPathAnalysis();
                             if (kind.equals("get"))
                                 mockMvc.perform(get(path, pathArgs));
                             if (kind.equals("post"))

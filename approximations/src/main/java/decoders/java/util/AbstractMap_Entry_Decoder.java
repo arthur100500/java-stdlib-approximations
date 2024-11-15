@@ -32,9 +32,7 @@ public class AbstractMap_Entry_Decoder implements ObjectDecoder {
             }
         }
 
-        return approxData.getObjectField(f_value) != null
-                ? approxData.decodeField(f_value)
-                : null;
+        return approxData.decodeField(f_value);
     }
 
     @Override

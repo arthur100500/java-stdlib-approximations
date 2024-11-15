@@ -51,17 +51,15 @@ public class SpringApplicationImpl {
         for (String controllerName : allPaths.keySet()) {
             boolean controllerFound = Engine.makeSymbolicBoolean();
             if (controllerFound) {
-                _internalLog("[USVM] starting to analyze controller ", controllerName);
                 Map<String, List<Object>> paths = allPaths.get(controllerName);
                 for (String path : paths.keySet()) {
                     boolean pathFound = Engine.makeSymbolicBoolean();
                     if (pathFound) {
-                        _internalLog("[USVM] starting to analyze path ", path);
+                        _internalLog("[USVM] starting to analyze path ", path, " of controller ", controllerName);
                         List<Object> properties = paths.get(path);
                         String kind = (String) properties.get(0);
                         Integer paramCount = (Integer) properties.get(1);
                         Object[] pathArgs = new Object[paramCount];
-                        _startOfPathAnalysis();
                         try {
                             if (kind.equals("get"))
                                 mockMvc.perform(get(path, pathArgs));
@@ -78,19 +76,16 @@ public class SpringApplicationImpl {
                             _internalLog("[USVM] analysis finished with exception");
                         }
 
-                        _endOfPathAnalysis();
                         return;
                     }
                 }
+
+                return;
             }
         }
     }
 
     private void _startAnalysis() { }
-
-    private void _startOfPathAnalysis() { }
-
-    private void _endOfPathAnalysis() { }
 
     public void setListeners(Collection<? extends ApplicationListener<?>> listeners) {
         registerShutdownHook = false;

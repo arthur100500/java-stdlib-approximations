@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.usvm.api.Engine;
+import runtime.LibSLRuntime;
 
 import java.util.*;
 
@@ -38,6 +39,7 @@ public class SpringApplicationImpl {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         _startAnalysis();
         Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
@@ -59,7 +61,14 @@ public class SpringApplicationImpl {
                         List<Object> properties = paths.get(path);
                         String kind = (String) properties.get(0);
                         Integer paramCount = (Integer) properties.get(1);
+//                        List<Class<Object>> paramTypes = (List<Class<Object>>) properties.get(1);
+//                        // TODO: if primitive, make default values! #CM
+//                        Object[] pathArgs = new Object[paramTypes.size()];
+//                        for (int i = 0; i < pathArgs.length; i++) {
+//                            pathArgs[i] = LibSLRuntime.DefaultValues.getDefaultValue(paramTypes.get(i));
+//                        }
                         Object[] pathArgs = new Object[paramCount];
+                        Arrays.fill(pathArgs, 0);
                         try {
                             if (kind.equals("get"))
                                 mockMvc.perform(get(path, pathArgs));

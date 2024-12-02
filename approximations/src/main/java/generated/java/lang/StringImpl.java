@@ -205,6 +205,11 @@ public class StringImpl implements Serializable {
         _assumeInvariants(this);
     }
 
+    boolean isLatin1() {
+        _assumeInvariants();
+        return _currentCoder() == LATIN1;
+    }
+
     byte coder() {
         _assumeInvariants();
         return coder;

@@ -3,7 +3,7 @@ package generated.org.springframework.boot;
 import org.usvm.api.Engine;
 
 public class SymbolicValueFactory {
-    public static Object createSymbolic(Class<?> type) {
+    public static Object createSymbolic(Class<?> type, boolean makeNullable) {
         if (type == boolean.class)
             return Engine.makeSymbolicBoolean();
         if (type == int.class)
@@ -19,6 +19,10 @@ public class SymbolicValueFactory {
         if (type == short.class)
             return Engine.makeSymbolicShort();
 
-        return Engine.makeNullableSymbolic(type);
+        if (makeNullable)
+            return Engine.makeNullableSymbolic(type);
+
+        // TODO: think about interfaces, maybe use subtype constraints #Approx
+        return Engine.makeSymbolic(type);
     }
 }

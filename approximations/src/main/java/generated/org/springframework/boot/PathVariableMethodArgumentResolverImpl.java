@@ -22,6 +22,8 @@ public class PathVariableMethodArgumentResolverImpl {
         String path = (String) req.getAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern");
         PathVariable annotation = parameter.getParameterAnnotation(PathVariable.class);
         String name = annotation.name();
+        if (name.isEmpty())
+            name = parameter.getParameterName();
 //        boolean required = true;
 //        if (annotation != null)
 //            required = annotation.required();

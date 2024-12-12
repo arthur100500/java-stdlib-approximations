@@ -198,7 +198,9 @@ public class StringImpl implements Serializable {
     private void _assumeInvariants(StringImpl obj) {
         Engine.assume(obj.coder == _currentCoder());
         Engine.assume(obj.value != null);
-        Engine.assume((obj.value.length >> obj.coder) <= STRING_LENGTH_MAX);
+        int len = obj.value.length >> obj.coder;
+        Engine.assume(len >= 0);
+        Engine.assume(len <= STRING_LENGTH_MAX);
     }
 
     private void _assumeInvariants() {

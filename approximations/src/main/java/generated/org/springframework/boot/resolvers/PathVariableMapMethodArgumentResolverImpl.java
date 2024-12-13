@@ -6,9 +6,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.servlet.mvc.method.annotation.PathVariableMapMethodArgumentResolver;
 import stub.java.util.map.RequestMap;
 
-@Approximate(PathVariableMapMethodArgumentResolverImpl.class)
+@Approximate(PathVariableMapMethodArgumentResolver.class)
 public class PathVariableMapMethodArgumentResolverImpl {
     public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {

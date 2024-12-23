@@ -58,7 +58,7 @@ public class LinkedHashSet_Decoder implements ObjectDecoder {
         if (superclass == null) {
             return clazz.getDeclaredFields();
         }
-        List<JcField> declaredFields = clazz.getDeclaredFields();
+        List<JcField> declaredFields = new ArrayList<>(clazz.getDeclaredFields());
         declaredFields.addAll(getAllFields(superclass));
         return declaredFields;
     }

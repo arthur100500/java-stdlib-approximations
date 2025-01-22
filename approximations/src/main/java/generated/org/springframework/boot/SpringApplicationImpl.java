@@ -7,6 +7,7 @@ import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Service;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,7 +25,7 @@ public class SpringApplicationImpl {
 
     private ApplicationContextFactory applicationContextFactory = ApplicationContextFactory.DEFAULT;
 
-    private boolean registerShutdownHook = true;
+    private boolean registerShutdownHook = false;
 
     private Map<String, Map<String, List<Object>>> _allControllerPaths() {
         return new HashMap<>();
@@ -38,16 +39,28 @@ public class SpringApplicationImpl {
         }
     }
 
+    private static void _initValueFieldsSymbolic(Object obj) { }
+
+    private static List<Class<?>> _classesWithFieldsValueAnnotation() {
+        return new ArrayList<>();
+    }
+
     @SuppressWarnings("unchecked")
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
+        // TODO: care about conditional beans
         _startAnalysis();
-        Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
-        Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
+        // TODO: enable filters!
+//        Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
+//        Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
         DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
-        for (Filter filter : filters) {
-            builder.addFilter(filter);
-        }
+//        builder.addFilters(filters);
         MockMvc mockMvc = builder.build();
+        // Making fields with `@Value` annotation symbolic
+        for (Class<?> type : _classesWithFieldsValueAnnotation()) {
+            for (Object obj : context.getBeansOfType(type).values()) {
+                _initValueFieldsSymbolic(obj);
+            }
+        }
         Map<String, Map<String, List<Object>>> allPaths = _allControllerPaths();
         for (String controllerName : allPaths.keySet()) {
             boolean controllerFound = Engine.makeSymbolicBoolean();

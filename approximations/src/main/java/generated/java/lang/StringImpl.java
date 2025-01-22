@@ -8,7 +8,7 @@ import org.jacodb.approximation.annotation.Approximate;
 import org.usvm.api.Engine;
 import runtime.LibSLRuntime;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "overrides"})
 @Approximate(java.lang.String.class)
 public class StringImpl implements Serializable {
 
@@ -270,5 +270,34 @@ public class StringImpl implements Serializable {
             throw new StringIndexOutOfBoundsException(count);
 
         LibSLRuntime.ArrayActions.copy(this.value, srcByteBegin, dst, dstByteBegin, count);
+    }
+
+    public static boolean latin1Equals(byte[] value, byte[] other) {
+        if (value.length == other.length) {
+            for(int i = 0; i < value.length; ++i) {
+                if (value[i] != other[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean equals(Object anObject) {
+        _assumeInvariants();
+        if (this == anObject) {
+            return true;
+        } else {
+            if (anObject instanceof StringImpl) {
+                StringImpl aString = (StringImpl)anObject;
+                _assumeInvariants(aString);
+                return (!COMPACT_STRINGS || this.coder == aString.coder) && latin1Equals(this.value, aString.value);
+            }
+
+            return false;
+        }
     }
 }

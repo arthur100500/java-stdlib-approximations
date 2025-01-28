@@ -14,12 +14,13 @@ import static generated.org.springframework.boot.SymbolicValueFactory.createSymb
 @Approximate(RequestResponseBodyMethodProcessor.class)
 public class RequestResponseBodyMethodProcessorImpl {
 
-    public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
-        Class<?> paramType = parameter.getParameterType();
-        RequestBody annotation = parameter.getParameterAnnotation(RequestBody.class);
-        boolean required = true;
-        if (annotation != null)
-            required = annotation.required();
-        return createSymbolic(paramType, !required);
-    }
+    // TODO: Write handleReturnValue and remove this
+    //    public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+    //        Class<?> paramType = parameter.getParameterType();
+    //        RequestBody annotation = parameter.getParameterAnnotation(RequestBody.class);
+    //        boolean required = true;
+    //        if (annotation != null)
+    //            required = annotation.required();
+    //        return createSymbolic(paramType, !required);
+    //    }
 }

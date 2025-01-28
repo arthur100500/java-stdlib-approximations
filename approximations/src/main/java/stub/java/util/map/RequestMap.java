@@ -26,6 +26,8 @@ public class RequestMap implements Map<String, String> {
 
     public String get(Object key) { throw new LinkageError(); }
 
+    public String set(String key, Object value) { throw new LinkageError(); }
+
     @Nullable
     public String put(String key, String value) { throw new LinkageError(); }
 

@@ -42,10 +42,10 @@ public class SpringApplicationImpl {
         // TODO: care about conditional beans
         _startAnalysis();
         // TODO: enable filters!
-//        Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
-//        Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
+        Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
+        Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
         DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
-//        builder.addFilters(filters);
+        builder.addFilters(filters);
         MockMvc mockMvc = builder.build();
         Map<String, Map<String, List<Object>>> allPaths = _allControllerPaths();
         for (String controllerName : allPaths.keySet()) {

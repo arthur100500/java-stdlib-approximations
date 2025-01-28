@@ -17,6 +17,7 @@ import jdk.internal.misc.VM;
 import org.jacodb.approximation.annotation.Approximate;
 import org.usvm.api.Engine;
 import runtime.LibSLRuntime;
+import stub.java.lang.SystemHelpers;
 
 @SuppressWarnings({"unused", "removal"})
 @Approximate(java.lang.System.class)
@@ -34,8 +35,6 @@ public final class SystemImpl {
     public static PrintStream out = null;
 
     public static PrintStream err = null;
-
-    private static final LibSLRuntime.Map<Object, Integer> identityHashCodeMap = new LibSLRuntime.Map<>(new LibSLRuntime.IdentityMapContainer<>());
 
     static {
         initPhase1();
@@ -229,14 +228,14 @@ public final class SystemImpl {
         if (x == null)
             return 0;
 
-        if (identityHashCodeMap.hasKey(x)) {
-            Integer value = identityHashCodeMap.get(x);
+        if (SystemHelpersImpl.identityHashCodeMap.hasKey(x)) {
+            Integer value = SystemHelpersImpl.identityHashCodeMap.get(x);
             Engine.assume(value != null);
             return value;
         }
 
-        int result = identityHashCodeMap.size();
-        identityHashCodeMap.set(x, result);
+        int result = SystemHelpersImpl.identityHashCodeMap.size();
+        SystemHelpersImpl.identityHashCodeMap.set(x, result);
         return result;
     }
 

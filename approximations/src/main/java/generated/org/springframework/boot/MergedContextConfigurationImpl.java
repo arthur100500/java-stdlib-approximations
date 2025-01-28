@@ -8,6 +8,7 @@ import org.springframework.test.context.MergedContextConfiguration;
 import java.util.Collections;
 import java.util.Set;
 
+// TODO: delete? #Approx
 @Approximate(MergedContextConfiguration.class)
 public class MergedContextConfigurationImpl {
 
@@ -19,7 +20,7 @@ public class MergedContextConfigurationImpl {
         if (contextCustomizers == null)
             return EMPTY_CONTEXT_CUSTOMIZERS;
 
-        contextCustomizers.removeIf(it -> it.getClass().getName().contains("TypeExcludeFiltersContextCustomizer"));
+//        contextCustomizers.removeIf(it -> it.getClass().getName().contains("TypeExcludeFiltersContextCustomizer"));
 
         return contextCustomizers;
     }

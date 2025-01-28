@@ -32,6 +32,8 @@ public class PageImplImpl<T> {
     private void _assume() {
         Engine.assume(this.content != null);
         Engine.assume(this.pageable != null);
+        Engine.assume(this.total >= 0);
+        Engine.assume(this.total <= 20);
     }
 
     public int getTotalPages() {
@@ -107,5 +109,10 @@ public class PageImplImpl<T> {
     public Iterator<T> iterator() {
         _assume();
         return content.iterator();
+    }
+
+    public List<T> toList() {
+        _assume();
+        return content;
     }
 }

@@ -58,7 +58,7 @@ public class ModelMap_Decoder implements ObjectDecoder {
         if (superclass == null) {
             return clazz.getDeclaredFields();
         }
-        List<JcField> declaredFields = clazz.getDeclaredFields();
+        List<JcField> declaredFields = new ArrayList<>(clazz.getDeclaredFields());
         declaredFields.addAll(getAllFields(superclass));
         return declaredFields;
     }
@@ -68,7 +68,7 @@ public class ModelMap_Decoder implements ObjectDecoder {
         if (superclass == null) {
             return clazz.getDeclaredMethods();
         }
-        List<JcMethod> declaredMethods = clazz.getDeclaredMethods();
+        List<JcMethod> declaredMethods = new ArrayList<>(clazz.getDeclaredMethods());
         declaredMethods.addAll(getAllMethods(superclass));
         return declaredMethods;
     }

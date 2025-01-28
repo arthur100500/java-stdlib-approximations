@@ -14,7 +14,7 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 @Approximate(ModelMap.class)
-public class ModelMapImpl extends LinkedHashMapImpl<String, Object> {
+public class    ModelMapImpl extends LinkedHashMapImpl<String, Object> {
 
     public String lastKey = null;
 

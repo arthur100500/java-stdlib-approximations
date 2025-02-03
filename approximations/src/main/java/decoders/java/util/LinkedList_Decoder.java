@@ -12,6 +12,8 @@ import org.usvm.api.decoder.ObjectDecoder;
 
 import java.util.*;
 
+import static org.usvm.api.decoder.DecoderUtils.findStorageField;
+
 @SuppressWarnings("ForLoopReplaceableByForEach")
 @DecoderFor(LinkedList.class)
 public class LinkedList_Decoder implements ObjectDecoder {
@@ -66,14 +68,7 @@ public class LinkedList_Decoder implements ObjectDecoder {
         JcField f_storage = cached_LinkedList_storage;
         // TODO: add synchronization if needed
         if (f_storage == null) {
-            final List<JcField> fields = approximation.getDeclaredFields();
-            for (int i = 0, c = fields.size(); i < c; i++) {
-                JcField f = fields.get(i);
-                if ("storage".equals(f.getName())) {
-                    cached_LinkedList_storage = f_storage = f;
-                    break;
-                }
-            }
+            cached_LinkedList_storage = f_storage = findStorageField(approximation);
         }
 
         if (approximationData.getObjectField(f_storage) == null)
@@ -91,4 +86,3 @@ public class LinkedList_Decoder implements ObjectDecoder {
         }
     }
 }
-

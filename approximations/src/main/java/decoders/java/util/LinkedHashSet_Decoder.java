@@ -15,6 +15,7 @@ import static org.usvm.api.decoder.DecoderUtils.findStorageField;
 
 @DecoderFor(LinkedHashSet.class)
 public class LinkedHashSet_Decoder implements ObjectDecoder {
+    // TODO: unify with HashSet_Decoder
     private volatile JcMethod[] cachedMethods = null;
     private volatile JcMethod cached_LinkedHashSet_ctor = null;
     private volatile JcMethod cached_LinkedHashSet_add = null;

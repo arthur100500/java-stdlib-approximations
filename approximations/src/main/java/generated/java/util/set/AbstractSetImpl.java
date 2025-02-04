@@ -118,15 +118,18 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
     }
 
     protected Object[] _mapToArray() {
-        int size = _getStorage().size();
-        Object[] items = new Object[size];
+        ArrayList<E> items = new ArrayList<>();
         LibSLRuntime.Map<E, Object> unseen = _getStorage().duplicate();
-        for (int i = 0; i < size; i++) {
+        while (true) {
             E key = unseen.anyKey();
+            if (!unseen.hasKey(key)) {
+                break;
+            }
             unseen.remove(key);
-            items[i] = key;
+            items.add(key);
         }
-        return items;
+
+        return items.toArray();
     }
 
     @SuppressWarnings("unchecked")

@@ -32,22 +32,20 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
 
     abstract Content _contentByKey(LibSLRuntime.Map<K, Map.Entry<K, V>> storage, K key);
 
-    @SuppressWarnings("ConstantValue")
     protected Object[] _mapToArray() {
+        ArrayList<Content> items = new ArrayList<>();
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
-        int storageSize = storage.size();
-        Object[] result = new Object[storageSize];
-        if (storageSize == 0)
-            return result;
-
-        Engine.assume(storageSize > 0);
         LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = storage.duplicate();
-        for (int i = 0; i < storageSize; i++) {
+        while (true) {
             K curKey = unseen.anyKey();
-            result[i] = _contentByKey(storage, curKey);
+            if (!unseen.hasKey(curKey)) {
+                break;
+            }
             unseen.remove(curKey);
+            items.add(_contentByKey(storage, curKey));
         }
-        return result;
+
+        return items.toArray();
     }
 
     public boolean add(Content e) {

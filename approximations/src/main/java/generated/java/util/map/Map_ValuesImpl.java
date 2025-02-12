@@ -76,6 +76,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.iterator();
     }
 
+    @NotNull
     public Stream<V> parallelStream() {
         return super.parallelStream();
     }
@@ -105,7 +106,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.removeAll(c);
     }
 
-    public boolean removeIf(Predicate<? super V> filter) {
+    public boolean removeIf(@NotNull Predicate<? super V> filter) {
         return super.removeIf(filter);
     }
 
@@ -117,10 +118,12 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.size();
     }
 
+    @NotNull
     public Spliterator<V> spliterator() {
         return super.spliterator();
     }
 
+    @NotNull
     public Stream<V> stream() {
         return super.stream();
     }
@@ -130,7 +133,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
         return super.toArray(generator);
     }
 

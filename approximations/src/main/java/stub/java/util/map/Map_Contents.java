@@ -91,7 +91,7 @@ public abstract class Map_Contents<K, V, Content> extends AbstractCollection<Con
         throw new LinkageError();
     }
 
-    public int size() {
+    public int _size() {
         throw new LinkageError();
     }
 
@@ -117,7 +117,7 @@ public abstract class Map_Contents<K, V, Content> extends AbstractCollection<Con
         throw new LinkageError();
     }
 
-    public String toString() {
+    public String _toString() {
         throw new LinkageError();
     }
 }

@@ -42,15 +42,20 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
         return _getList()._getStorage().size();
     }
 
-    public int characteristics() {
+    protected int _characteristics() {
         return LibSLGlobals.SPLITERATOR_ORDERED | LibSLGlobals.SPLITERATOR_SIZED | LibSLGlobals.SPLITERATOR_SUBSIZED;
     }
 
-    public long estimateSize() {
-        return super.estimateSize();
+    @SuppressWarnings("MagicConstant")
+    public int characteristics() {
+        return _characteristics();
     }
 
-    public void forEachRemaining(Consumer<? super E> _action) {
+    public long estimateSize() {
+        return super._estimateSize();
+    }
+
+    protected void _forEachRemaining(Consumer<? super E> _action) {
         if (_action == null)
             throw new NullPointerException();
 
@@ -64,11 +69,15 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
         _checkForModification();
     }
 
-    public long getExactSizeIfKnown() {
-        return super.getExactSizeIfKnown();
+    public void forEachRemaining(Consumer<? super E> _action) {
+        _forEachRemaining(_action);
     }
 
-    public boolean tryAdvance(Consumer<? super E> _action) {
+    public long getExactSizeIfKnown() {
+        return super._getExactSizeIfKnown();
+    }
+
+    protected boolean _tryAdvance(Consumer<? super E> _action) {
         if (_action == null)
             throw new NullPointerException();
 
@@ -86,7 +95,11 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
         return true;
     }
 
+    public boolean tryAdvance(Consumer<? super E> _action) {
+        return _tryAdvance(_action);
+    }
+
     public ListSpliteratorStubImpl<E> trySplit() {
-        return (ListSpliteratorStubImpl<E>) super.trySplit();
+        return (ListSpliteratorStubImpl<E>) super._trySplit();
     }
 }

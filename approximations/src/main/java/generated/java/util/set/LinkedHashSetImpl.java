@@ -73,6 +73,7 @@ public class LinkedHashSetImpl<E> extends HashSetImpl<E> implements Cloneable, S
         return super.size();
     }
 
+    @NotNull
     public Spliterator<E> spliterator() {
         return super.spliterator();
     }
@@ -99,7 +100,7 @@ public class LinkedHashSetImpl<E> extends HashSetImpl<E> implements Cloneable, S
         return super.toArray(a);
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
         return super.toArray(generator);
     }
 
@@ -115,7 +116,7 @@ public class LinkedHashSetImpl<E> extends HashSetImpl<E> implements Cloneable, S
         return super.retainAll(c);
     }
 
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@NotNull Predicate<? super E> filter) {
         return super.removeIf(filter);
     }
 
@@ -123,10 +124,12 @@ public class LinkedHashSetImpl<E> extends HashSetImpl<E> implements Cloneable, S
         super.forEach(userAction);
     }
 
+    @NotNull
     public Stream<E> stream() {
         return super.stream();
     }
 
+    @NotNull
     public Stream<E> parallelStream() {
         return super.parallelStream();
     }

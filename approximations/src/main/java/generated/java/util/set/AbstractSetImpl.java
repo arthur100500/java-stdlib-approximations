@@ -25,15 +25,15 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
 
     private boolean isHashSet;
 
-    private static <E> LibSLRuntime.Map.Container<E, Object> createContainer(boolean isHashSet) {
+    private static <E> LibSLRuntime.Map.Container<E, Object> _createContainer(boolean isHashSet) {
         if (isHashSet)
             return new LibSLRuntime.HashMapContainer<>();
 
         return new LibSLRuntime.IdentityMapContainer<>();
     }
 
-    private static <E> LibSLRuntime.Map<E, Object> createStorage(boolean isHashSet) {
-        return new LibSLRuntime.Map<>(createContainer(isHashSet));
+    private static <E> LibSLRuntime.Map<E, Object> _createStorage(boolean isHashSet) {
+        return new LibSLRuntime.Map<>(_createContainer(isHashSet));
     }
 
     public AbstractSetImpl(LibSLRuntime.Map<E, Object> storage, int modCount, boolean isHashSet) {
@@ -43,7 +43,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
     }
 
     public AbstractSetImpl(boolean isHashSet) {
-        this(createStorage(isHashSet), 0, isHashSet);
+        this(_createStorage(isHashSet), 0, isHashSet);
     }
 
     @SuppressWarnings("unused")
@@ -59,7 +59,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         if (initialCapacity < 0)
             throw new IllegalArgumentException();
 
-        this.storage = createStorage(isHashSet);
+        this.storage = _createStorage(isHashSet);
         this.isHashSet = isHashSet;
     }
 
@@ -73,7 +73,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         if (loadFactor <= 0 || loadFactor != loadFactor)
             throw new IllegalArgumentException();
 
-        this.storage = createStorage(isHashSet);
+        this.storage = _createStorage(isHashSet);
         this.isHashSet = isHashSet;
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return storage;
     }
 
-    private void _add(E key) {
+    private void _internalAdd(E key) {
         _getStorage().set(key, LibSLGlobals.SOMETHING);
     }
 
@@ -105,7 +105,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         } else {
             for (E key : c) {
                 if (!storage.hasKey(key))
-                    _add(key);
+                    _internalAdd(key);
             }
         }
 
@@ -138,7 +138,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return new StreamStubImpl<>(items, parallel);
     }
 
-    public boolean add(E obj) {
+    public boolean _add(E obj) {
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         this.modCount++;
         if (storage.hasKey(obj))
@@ -148,13 +148,13 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return true;
     }
 
-    public void clear() {
-        this.storage = createStorage(this.isHashSet);
+    public void _clear() {
+        this.storage = _createStorage(this.isHashSet);
         this.modCount++;
     }
 
     @SuppressWarnings("unchecked")
-    public Object clone() throws CloneNotSupportedException {
+    public Object _clone() throws CloneNotSupportedException {
         AbstractSetImpl<E> clonedSet = (AbstractSetImpl<E>) super.clone();
         clonedSet.modCount = 0;
         clonedSet.storage = _getStorage().duplicate();
@@ -162,25 +162,25 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
     }
 
     @SuppressWarnings("unchecked")
-    public boolean contains(Object obj) {
+    public boolean _contains(Object obj) {
         if (isEmpty())
             return false;
 
         return _getStorage().hasKey((E) obj);
     }
 
-    public boolean isEmpty() {
+    public boolean _isEmpty() {
         return _getStorage().size() == 0;
     }
 
     @NotNull
-    public Iterator<E> iterator() {
+    public Iterator<E> _iterator() {
         LibSLRuntime.Map<E, Object> unseenKeys = _getStorage().duplicate();
         return new Set_IteratorImpl<>(this.modCount, unseenKeys, this, null);
     }
 
     @SuppressWarnings("unchecked")
-    public boolean remove(Object elem) {
+    public boolean _remove(Object elem) {
         E typedElem = (E) elem;
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         if (storage.hasKey(typedElem)) {
@@ -192,16 +192,16 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return false;
     }
 
-    public int size() {
+    public int _size() {
         return _getStorage().size();
     }
 
-    public Spliterator<E> spliterator() {
+    public Spliterator<E> _spliterator() {
         return new Set_SpliteratorImpl<>(this);
     }
 
     @SuppressWarnings("unchecked")
-    public boolean equals(Object other) {
+    public boolean _equals(Object other) {
         if (other == this)
             return true;
 
@@ -224,12 +224,12 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return result;
     }
 
-    public int hashCode() {
+    public int _hashCode() {
         return LibSLRuntime.hashCode(_getStorage());
     }
 
     @SuppressWarnings({"ConstantValue", "unchecked"})
-    public boolean removeAll(@NotNull Collection<?> c) {
+    public boolean _removeAll(@NotNull Collection<?> c) {
         if (c == null) {
             throw new NullPointerException();
         }
@@ -262,21 +262,21 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
     }
 
     @NotNull
-    public Object[] toArray() {
-        return super.toArray();
+    public Object[] _toArray() {
+        return super._toArray();
     }
 
     @NotNull
-    public <T> T[] toArray(@NotNull T[] array) {
-        return super.toArray(array);
+    public <T> T[] _toArray(@NotNull T[] array) {
+        return super._toArray(array);
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
+    public <T> T[] _toArray(IntFunction<T[]> generator) {
+        return super._toArray(generator);
     }
 
     @SuppressWarnings("unchecked")
-    public boolean containsAll(@NotNull Collection<?> c) {
+    public boolean _containsAll(@NotNull Collection<?> c) {
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         for (Object key : c) {
             if (!storage.hasKey((E) key))
@@ -286,12 +286,12 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return true;
     }
 
-    public boolean addAll(@NotNull Collection<? extends E> c) {
+    public boolean _addAll(@NotNull Collection<? extends E> c) {
         return _addAllElements(c);
     }
 
     @SuppressWarnings("ConstantValue")
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean _retainAll(@NotNull Collection<?> c) {
         if (c == null)
             throw new NullPointerException();
 
@@ -314,7 +314,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return false;
     }
 
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean _removeIf(Predicate<? super E> filter) {
         if (filter == null)
             throw new NullPointerException();
 
@@ -339,7 +339,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return false;
     }
 
-    public void forEach(Consumer<? super E> userAction) {
+    public void _forEach(Consumer<? super E> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
@@ -357,15 +357,15 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         _checkForModification(expectedModCount);
     }
 
-    public Stream<E> stream() {
+    public Stream<E> _stream() {
         return _makeStream(false);
     }
 
-    public Stream<E> parallelStream() {
+    public Stream<E> _parallelStream() {
         return _makeStream(true);
     }
 
-    public String toString() {
+    public String _toString() {
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         int count = storage.size();
         if (count == 0)

@@ -41,7 +41,7 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
 
     @SuppressWarnings("unused")
     public LinkedListImpl() {
-        super();
+        super(Engine.makeSymbolicList(), 0);
     }
 
     @SuppressWarnings("unused")
@@ -60,23 +60,23 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
         if (!_isValidIndex(0))
             throw new NoSuchElementException();
 
-        return _get(0);
+        return _uncheckedGet(0);
     }
 
     public boolean add(E e) {
-        return super.add(e);
+        return super._add(e);
     }
 
     public void add(int index, E element) {
-        super.add(index, element);
+        super._add(index, element);
     }
 
     public boolean addAll(@NotNull Collection<? extends E> c) {
-        return super.addAll(c);
+        return super._addAll(c);
     }
 
     public boolean addAll(int index, @NotNull Collection<? extends E> c) {
-        return super.addAll(index, c);
+        return super._addAll(index, c);
     }
 
     public void addFirst(E e) {
@@ -88,20 +88,20 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
     }
 
     public void clear() {
-        super.clear();
+        super._clear();
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+        return super._clone();
     }
 
     public boolean contains(Object o) {
-        return super.contains(o);
+        return super._contains(o);
     }
 
-    @SuppressWarnings("SlowListContainsAll")
     public boolean containsAll(@NotNull Collection<?> c) {
-        return super.containsAll(c);
+        return super._containsAll(c);
     }
 
     @NotNull
@@ -113,16 +113,17 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
         return _getFirstElement();
     }
 
+    @SuppressWarnings("EqualsDoesntCheckParameterClass")
     public boolean equals(Object o) {
-        return Engine.typeIs(o, LinkedListImpl.class) && super.equals(o);
+        return Engine.typeIs(o, LinkedListImpl.class) && super._equals(o);
     }
 
     public void forEach(Consumer<? super E> _action) {
-        super.forEach(_action);
+        super._forEach(_action);
     }
 
     public E get(int index) {
-        return super.get(index);
+        return super._get(index);
     }
 
     public E getFirst() {
@@ -130,38 +131,38 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
     }
 
     public E getLast() {
-        return super.get(_getStorage().size() - 1);
+        return super._get(_getStorage().size() - 1);
     }
 
     public int hashCode() {
-        return super.hashCode();
+        return super._hashCode();
     }
 
     public int indexOf(Object o) {
-        return super.indexOf(o);
+        return super._indexOf(o);
     }
 
     public boolean isEmpty() {
-        return super.isEmpty();
+        return super._isEmpty();
     }
 
     @NotNull
     public Iterator<E> iterator() {
-        return super.iterator();
+        return super._iterator();
     }
 
     public int lastIndexOf(Object o) {
-        return super.lastIndexOf(o);
+        return super._lastIndexOf(o);
     }
 
     @NotNull
     public ListIterator<E> listIterator() {
-        return super.listIterator();
+        return super._listIterator();
     }
 
     @NotNull
     public ListIterator<E> listIterator(int index) {
-        return super.listIterator(index);
+        return super._listIterator(index);
     }
 
     public boolean offer(E e) {
@@ -178,15 +179,16 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
         return true;
     }
 
+    @NotNull
     public Stream<E> parallelStream() {
-        return super.parallelStream();
+        return super._parallelStream();
     }
 
     public E peek() {
         if (isEmpty())
             return null;
 
-        return _get(0);
+        return _uncheckedGet(0);
     }
 
     public E peekFirst() {
@@ -198,7 +200,7 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
         if (size == 0)
             return null;
 
-        return _get(size - 1);
+        return _uncheckedGet(size - 1);
     }
 
     public E poll() {
@@ -233,15 +235,15 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
     }
 
     public boolean remove(Object o) {
-        return super.remove(o);
+        return super._remove(o);
     }
 
     public E remove(int index) {
-        return super.remove(index);
+        return super._remove(index);
     }
 
     public boolean removeAll(@NotNull Collection<?> c) {
-        return super.removeAll(c);
+        return super._removeAll(c);
     }
 
     public E removeFirst() {
@@ -252,8 +254,8 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
         return remove(o);
     }
 
-    public boolean removeIf(Predicate<? super E> filter) {
-        return super.removeIf(filter);
+    public boolean removeIf(@NotNull Predicate<? super E> filter) {
+        return super._removeIf(filter);
     }
 
     public E removeLast() {
@@ -289,54 +291,56 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
         return false;
     }
 
-    public void replaceAll(UnaryOperator<E> op) {
-        super.replaceAll(op);
+    public void replaceAll(@NotNull UnaryOperator<E> op) {
+        super._replaceAll(op);
     }
 
     public boolean retainAll(@NotNull Collection<?> c) {
-        return super.retainAll(c);
+        return super._retainAll(c);
     }
 
     public E set(int index, E element) {
-        return super.set(index, element);
+        return super._set(index, element);
     }
 
     public int size() {
-        return super.size();
+        return super._size();
     }
 
     public void sort(Comparator<? super E> c) {
-        super.sort(c);
+        super._sort(c);
     }
 
+    @NotNull
     public Spliterator<E> spliterator() {
-        return super.spliterator();
+        return super._spliterator();
     }
 
+    @NotNull
     public Stream<E> stream() {
-        return super.stream();
+        return super._stream();
     }
 
     @NotNull
     public List<E> subList(int fromIndex, int toIndex) {
-        return super.subList(fromIndex, toIndex);
+        return super._subList(fromIndex, toIndex);
     }
 
     @NotNull
     public Object[] toArray() {
-        return super.toArray();
+        return super._toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
+        return super._toArray(generator);
     }
 
     @NotNull
     public <T> T[] toArray(@NotNull T[] a) {
-        return super.toArray(a);
+        return super._toArray(a);
     }
 
     public String toString() {
-        return super.toString();
+        return super._toString();
     }
 }

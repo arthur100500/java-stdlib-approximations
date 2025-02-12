@@ -78,15 +78,20 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         return 0;
     }
 
-    public int characteristics() {
+    protected int _characteristics() {
         if (this.fence < 0 || this.index == 0 && this.fence == _storageSize())
             return LibSLGlobals.SPLITERATOR_SIZED | _defaultCharacteristics();
 
         return _defaultCharacteristics();
     }
 
+    @SuppressWarnings("MagicConstant")
+    public int characteristics() {
+        return _characteristics();
+    }
+
     public long estimateSize() {
-        return super.estimateSize();
+        return super._estimateSize();
     }
 
     private int _checkSizeOfUnseenKeys() {
@@ -116,7 +121,7 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         return storage;
     }
 
-    public void forEachRemaining(Consumer<? super Content> userAction) {
+    protected void _forEachRemaining(Consumer<? super Content> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
@@ -145,11 +150,15 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         _checkForModification();
     }
 
-    public long getExactSizeIfKnown() {
-        return super.getExactSizeIfKnown();
+    public void forEachRemaining(Consumer<? super Content> userAction) {
+        _forEachRemaining(userAction);
     }
 
-    public boolean tryAdvance(Consumer<? super Content> userAction) {
+    public long getExactSizeIfKnown() {
+        return super._getExactSizeIfKnown();
+    }
+
+    protected boolean _tryAdvance(Consumer<? super Content> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
@@ -177,6 +186,10 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         _checkForModification();
 
         return true;
+    }
+
+    public boolean tryAdvance(Consumer<? super Content> userAction) {
+        return _tryAdvance(userAction);
     }
 
     public Map_Contents_SpliteratorImpl<K, V, Content> trySplit() {

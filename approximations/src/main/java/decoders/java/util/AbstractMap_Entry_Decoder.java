@@ -2,10 +2,7 @@ package decoders.java.util;
 
 import org.jacodb.api.jvm.JcClassOrInterface;
 import org.jacodb.api.jvm.JcField;
-import org.usvm.api.decoder.DecoderApi;
-import org.usvm.api.decoder.DecoderFor;
-import org.usvm.api.decoder.ObjectData;
-import org.usvm.api.decoder.ObjectDecoder;
+import org.usvm.api.decoder.*;
 import stub.java.util.map.AbstractMap_Entry;
 
 import java.util.List;
@@ -14,7 +11,7 @@ import java.util.List;
 public class AbstractMap_Entry_Decoder implements ObjectDecoder {
     private volatile JcField cached_Entry_value = null;
 
-    @SuppressWarnings({"ForLoopReplaceableByForEach"})
+    @SuppressWarnings({"ForLoopReplaceableByForEach", "unchecked"})
     @Override
     public <T> T createInstance(final JcClassOrInterface approx,
                                 final ObjectData<T> approxData,
@@ -32,7 +29,8 @@ public class AbstractMap_Entry_Decoder implements ObjectDecoder {
             }
         }
 
-        return approxData.decodeField(f_value);
+        T value = approxData.decodeField(f_value);
+        return (T) new InternalMapEntry<T, T>(value);
     }
 
     @Override

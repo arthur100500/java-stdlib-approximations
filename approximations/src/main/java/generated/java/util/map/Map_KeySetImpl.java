@@ -70,6 +70,7 @@ public final class Map_KeySetImpl<K, V> extends Map_ContentsSetImpl<K, V, K> {
         return super.iterator();
     }
 
+    @NotNull
     public Stream<K> parallelStream() {
         return super.parallelStream();
     }
@@ -91,7 +92,7 @@ public final class Map_KeySetImpl<K, V> extends Map_ContentsSetImpl<K, V, K> {
         return super.removeAll(c);
     }
 
-    public boolean removeIf(Predicate<? super K> filter) {
+    public boolean removeIf(@NotNull Predicate<? super K> filter) {
         return super.removeIf(filter);
     }
 
@@ -103,10 +104,12 @@ public final class Map_KeySetImpl<K, V> extends Map_ContentsSetImpl<K, V, K> {
         return super.size();
     }
 
+    @NotNull
     public Spliterator<K> spliterator() {
         return super.spliterator();
     }
 
+    @NotNull
     public Stream<K> stream() {
         return super.stream();
     }
@@ -116,7 +119,7 @@ public final class Map_KeySetImpl<K, V> extends Map_ContentsSetImpl<K, V, K> {
         return super.toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
         return super.toArray(generator);
     }
 

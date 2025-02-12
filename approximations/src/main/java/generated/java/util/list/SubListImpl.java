@@ -37,6 +37,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
 
     @SuppressWarnings("DataFlowIssue")
     private SubListImpl(AbstractListImpl<E> list, SubListImpl<E> parent, int offset, int length, int modCount) {
+        super(null, 0);
         Engine.assume(list != null);
         Engine.assume(offset >= 0);
         Engine.assume(length >= 0);
@@ -183,7 +184,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
     @SuppressWarnings("unchecked")
     public Object clone() throws CloneNotSupportedException {
         SubListImpl<E> cloned = (SubListImpl<E>) super.clone();
-        cloned.list = (AbstractListImpl<E>) this.list.clone();
+        cloned.list = (AbstractListImpl<E>) this.list._clone();
         cloned.parentSubList = (SubListImpl<E>) this.parentSubList.clone();
         cloned.modCount = 0;
         return cloned;
@@ -428,16 +429,16 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
 
     @NotNull
     public Object[] toArray() {
-        return super.toArray();
+        return super._toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
+        return super._toArray(generator);
     }
 
     @NotNull
     public <T> T[] toArray(@NotNull T[] array) {
-        return super.toArray(array);
+        return super._toArray(array);
     }
 
     public String toString() {

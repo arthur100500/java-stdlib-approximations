@@ -48,21 +48,21 @@ public abstract class AbstractSpliteratorImpl<E> implements Spliterator<E> {
             throw new ConcurrentModificationException();
     }
 
-    public abstract int characteristics();
+    protected abstract int _characteristics();
 
-    public long estimateSize() {
-        return getExactSizeIfKnown();
+    public long _estimateSize() {
+        return _getExactSizeIfKnown();
     }
 
-    public abstract void forEachRemaining(Consumer<? super E> userAction);
+    protected abstract void _forEachRemaining(Consumer<? super E> userAction);
 
-    public long getExactSizeIfKnown() {
+    public long _getExactSizeIfKnown() {
         return _getFence() - this.index;
     }
 
-    public abstract boolean tryAdvance(Consumer<? super E> userAction);
+    protected abstract boolean _tryAdvance(Consumer<? super E> userAction);
 
-    public AbstractSpliteratorImpl<E> trySplit() {
+    protected AbstractSpliteratorImpl<E> _trySplit() {
         int hi = _getFence();
         int lo = this.index;
         int mid = (lo + hi) >>> 1;

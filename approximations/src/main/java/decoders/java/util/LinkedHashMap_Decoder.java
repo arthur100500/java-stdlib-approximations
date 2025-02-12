@@ -2,10 +2,7 @@ package decoders.java.util;
 
 import org.jacodb.api.jvm.*;
 import org.usvm.api.SymbolicMap;
-import org.usvm.api.decoder.DecoderApi;
-import org.usvm.api.decoder.DecoderFor;
-import org.usvm.api.decoder.ObjectData;
-import org.usvm.api.decoder.ObjectDecoder;
+import org.usvm.api.decoder.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -57,6 +54,7 @@ public class LinkedHashMap_Decoder implements ObjectDecoder {
         return decoder.invokeMethod(m_ctor, args);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> void initializeInstance(final JcClassOrInterface approximation,
                                        final ObjectData<T> approximationData,
@@ -139,7 +137,8 @@ public class LinkedHashMap_Decoder implements ObjectDecoder {
 
         while (length > 0) {
             T key = map.anyKey();
-            T value = map.get(key);
+            InternalMapEntry<T, T> entry = (InternalMapEntry<T, T>) map.get(key);
+            T value = entry.getValue();
 
             List<T> args = new ArrayList<>();
             args.add(outputInstance);

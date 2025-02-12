@@ -31,10 +31,6 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         this.storage = storage;
     }
 
-    public AbstractListImpl() {
-        this(Engine.makeSymbolicList(), 0);
-    }
-
     public AbstractListImpl(Collection<? extends E> c) {
         super(0);
 
@@ -160,13 +156,13 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         return _setElement(index, element);
     }
 
-    public E _get(int index) {
+    public E _uncheckedGet(int index) {
         return _getStorage().get(index);
     }
 
     public E _checkedGet(int index) {
         _checkValidIndex(index);
-        return _getStorage().get(index);
+        return _uncheckedGet(index);
     }
 
     public void _replaceAllRange(UnaryOperator<E> op, int i, int end) {
@@ -338,33 +334,33 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         _checkForModification(expectedModCount);
     }
 
-    public boolean add(E e) {
+    public boolean _add(E e) {
         SymbolicList<E> storage = _getStorage();
         storage.insert(storage.size(), e);
         this.modCount++;
         return true;
     }
 
-    public void add(int index, E element) {
+    public void _add(int index, E element) {
         _checkedAddElement(index, element);
     }
 
-    public boolean addAll(@NotNull Collection<? extends E> c) {
+    public boolean _addAll(@NotNull Collection<? extends E> c) {
         return _addAllElements(_getStorage().size(), c);
     }
 
-    public boolean addAll(int index, @NotNull Collection<? extends E> c) {
+    public boolean _addAll(int index, @NotNull Collection<? extends E> c) {
         _checkValidAddIndex(index);
         return _addAllElements(index, c);
     }
 
-    public void clear() {
+    public void _clear() {
         this.storage = Engine.makeSymbolicList();
         this.modCount++;
     }
 
     @SuppressWarnings("unchecked")
-    public Object clone() throws CloneNotSupportedException {
+    public Object _clone() throws CloneNotSupportedException {
         AbstractListImpl<E> clonedList = (AbstractListImpl<E>) super.clone();
         SymbolicList<E> storageCopy = Engine.makeSymbolicList();
         SymbolicList<E> storage = _getStorage();
@@ -374,12 +370,12 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         return clonedList;
     }
 
-    public boolean contains(Object o) {
+    public boolean _contains(Object o) {
         return indexOf(o) != -1;
     }
 
     @SuppressWarnings({"DataFlowIssue", "unchecked"})
-    public boolean containsAll(@NotNull Collection<?> c) {
+    public boolean _containsAll(@NotNull Collection<?> c) {
         if (c instanceof AbstractListImpl<?>) {
             SymbolicList<E> otherStorage = ((AbstractListImpl<E>) c)._getStorage();
             Engine.assume(otherStorage != null);
@@ -403,12 +399,12 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         return true;
     }
 
-    public void ensureCapacity(int minCapacity) {
+    public void _ensureCapacity(int minCapacity) {
         this.modCount++;
     }
 
     @SuppressWarnings("unchecked")
-    public boolean equals(Object other) {
+    public boolean _equals(Object other) {
         if (other == this)
             return true;
 
@@ -429,7 +425,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         return false;
     }
 
-    public void forEach(Consumer<? super E> _action) {
+    public void _forEach(Consumer<? super E> _action) {
         if (_action == null)
             throw new NullPointerException();
 
@@ -444,29 +440,29 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         _checkForModification(expectedModCount);
     }
 
-    public E get(int index) {
+    public E _get(int index) {
         return _checkedGet(index);
     }
 
-    public int hashCode() {
+    public int _hashCode() {
         return LibSLRuntime.hashCode(_getStorage());
     }
 
-    public int indexOf(Object o) {
+    public int _indexOf(Object o) {
         SymbolicList<E> storage = _getStorage();
         return LibSLRuntime.ListActions.find(storage, o, 0, storage.size());
     }
 
-    public boolean isEmpty() {
+    public boolean _isEmpty() {
         return _getStorage().size() == 0;
     }
 
     @NotNull
-    public Iterator<E> iterator() {
+    public Iterator<E> _iterator() {
         return new ListIteratorStubImpl<>(this);
     }
 
-    public int lastIndexOf(Object o) {
+    public int _lastIndexOf(Object o) {
         SymbolicList<E> storage = _getStorage();
         int size = storage.size();
         if (size == 0)
@@ -483,21 +479,21 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
     }
 
     @NotNull
-    public ListIterator<E> listIterator() {
+    public ListIterator<E> _listIterator() {
         return new ListIteratorStubImpl<>(this);
     }
 
     @NotNull
-    public ListIterator<E> listIterator(int index) {
+    public ListIterator<E> _listIterator(int index) {
         _checkValidIndex(index);
         return new ListIteratorStubImpl<>(this, index);
     }
 
-    public Stream<E> parallelStream() {
+    public Stream<E> _parallelStream() {
         return _makeStream(true);
     }
 
-    public boolean remove(Object o) {
+    public boolean _remove(Object o) {
         int index = indexOf(o);
         if (index == -1)
             return false;
@@ -507,19 +503,19 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
 
     }
 
-    public E remove(int index) {
+    public E _remove(int index) {
         return _checkedDeleteElement(index);
     }
 
-    public boolean removeAll(@NotNull Collection<?> c) {
+    public boolean _removeAll(@NotNull Collection<?> c) {
         return _batchRemove(c, false, 0, _getStorage().size());
     }
 
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean _removeIf(Predicate<? super E> filter) {
         return _removeIf(filter, 0, _getStorage().size());
     }
 
-    public void replaceAll(UnaryOperator<E> op) {
+    public void _replaceAll(UnaryOperator<E> op) {
         if (op == null)
             throw new NullPointerException();
 
@@ -527,51 +523,51 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         this.modCount++;
     }
 
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean _retainAll(@NotNull Collection<?> c) {
         return _batchRemove(c, true, 0, _getStorage().size());
     }
 
-    public E set(int index, E element) {
+    public E _set(int index, E element) {
         return _checkedSetElement(index, element);
     }
 
-    public int size() {
+    public int _size() {
         return _getStorage().size();
     }
 
-    public void sort(Comparator<? super E> c) {
+    public void _sort(Comparator<? super E> c) {
         _do_sort(0, _getStorage().size(), c);
     }
 
-    public Spliterator<E> spliterator() {
+    public Spliterator<E> _spliterator() {
         return new ListSpliteratorStubImpl<>(this);
     }
 
-    public Stream<E> stream() {
+    public Stream<E> _stream() {
         return _makeStream(false);
     }
 
     @NotNull
-    public List<E> subList(int fromIndex, int toIndex) {
+    public List<E> _subList(int fromIndex, int toIndex) {
         _subListRangeCheck(fromIndex, toIndex, _getStorage().size());
         return new SubListImpl<>(this, fromIndex, toIndex);
     }
 
     @NotNull
-    public Object[] toArray() {
+    public Object[] _toArray() {
         return _mapToArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
+    public <T> T[] _toArray(IntFunction<T[]> generator) {
+        return super._toArray(generator);
     }
 
     @NotNull
-    public <T> T[] toArray(@NotNull T[] array) {
-        return super.toArray(array);
+    public <T> T[] _toArray(@NotNull T[] array) {
+        return super._toArray(array);
     }
 
-    public String toString() {
+    public String _toString() {
         return LibSLRuntime.toString(_getStorage());
     }
 }

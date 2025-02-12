@@ -34,21 +34,31 @@ public abstract class AbstractArraySpliteratorImpl<E> extends AbstractSpliterato
     protected void _checkForModification() {
     }
 
+    @SuppressWarnings("MagicConstant")
     public boolean hasCharacteristics(int _characteristics) {
         return (this.characteristics & _characteristics) == _characteristics;
     }
 
-    public int characteristics() {
+    protected int _characteristics() {
         return this.characteristics;
     }
 
+    @SuppressWarnings("MagicConstant")
+    public int characteristics() {
+        return _characteristics();
+    }
+
     public long estimateSize() {
-        return super.estimateSize();
+        return super._estimateSize();
     }
 
     abstract protected E _getItem(int index);
 
     public void forEachRemaining(Consumer<? super E> _action) {
+        _forEachRemaining(_action);
+    }
+
+    protected void _forEachRemaining(Consumer<? super E> _action) {
         if (_action == null)
             throw new NullPointerException();
 
@@ -60,6 +70,7 @@ public abstract class AbstractArraySpliteratorImpl<E> extends AbstractSpliterato
         }
     }
 
+    @SuppressWarnings("MagicConstant")
     public Comparator<? super E> getComparator() {
         if (hasCharacteristics(LibSLGlobals.SPLITERATOR_SORTED))
             return null;
@@ -68,10 +79,14 @@ public abstract class AbstractArraySpliteratorImpl<E> extends AbstractSpliterato
     }
 
     public long getExactSizeIfKnown() {
-        return super.getExactSizeIfKnown();
+        return super._getExactSizeIfKnown();
     }
 
     public boolean tryAdvance(Consumer<? super E> _action) {
+        return _tryAdvance(_action);
+    }
+
+    protected boolean _tryAdvance(Consumer<? super E> _action) {
         if (_action == null)
             throw new NullPointerException();
 
@@ -86,6 +101,6 @@ public abstract class AbstractArraySpliteratorImpl<E> extends AbstractSpliterato
     }
 
     public AbstractArraySpliteratorImpl<E> trySplit() {
-        return (AbstractArraySpliteratorImpl<E>) super.trySplit();
+        return (AbstractArraySpliteratorImpl<E>) super._trySplit();
     }
 }

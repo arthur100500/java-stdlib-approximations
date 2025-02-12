@@ -32,7 +32,7 @@ public abstract class AbstractArraySpliterator<E> extends Spliterators.AbstractS
         throw new LinkageError();
     }
 
-    public int characteristics() {
+    public int _characteristics() {
         throw new LinkageError();
     }
 
@@ -42,7 +42,7 @@ public abstract class AbstractArraySpliterator<E> extends Spliterators.AbstractS
 
     abstract protected E _getItem(int index);
 
-    public void forEachRemaining(Consumer<? super E> _action) {
+    public void _forEachRemaining(Consumer<? super E> _action) {
         throw new LinkageError();
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractArraySpliterator<E> extends Spliterators.AbstractS
         throw new LinkageError();
     }
 
-    public boolean tryAdvance(Consumer<? super E> _action) {
+    public boolean _tryAdvance(Consumer<? super E> _action) {
         throw new LinkageError();
     }
 

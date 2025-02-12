@@ -137,6 +137,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         return new Map_Contents_IteratorImpl<>(this, getStorage().duplicate(), this.map.modCount);
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     public Stream<Content> parallelStream() {
         Content[] items = (Content[]) _mapToArray();
@@ -177,7 +178,8 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         return startStorageSize != storage.size();
     }
 
-    public boolean removeIf(Predicate<? super Content> filter) {
+    @SuppressWarnings("ConstantValue")
+    public boolean removeIf(@NotNull Predicate<? super Content> filter) {
         if (filter == null)
             throw new NullPointerException();
 
@@ -222,14 +224,20 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         return startStorageSize != storage.size();
     }
 
-    public int size() {
-        return this.map.size();
+    protected int _size() {
+        return this.map._size();
     }
 
+    public int size() {
+        return _size();
+    }
+
+    @NotNull
     public Spliterator<Content> spliterator() {
         return new Map_Contents_SpliteratorImpl<>(this);
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     public Stream<Content> stream() {
         Content[] items = (Content[]) _mapToArray();
@@ -238,19 +246,19 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
 
     @NotNull
     public Object[] toArray() {
-        return super.toArray();
+        return super._toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
+        return super._toArray(generator);
     }
 
     @NotNull
     public <T> T[] toArray(@NotNull T[] array) {
-        return super.toArray(array);
+        return super._toArray(array);
     }
 
-    public String toString() {
+    protected String _toString() {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
         int size = storage.size();
         if (size == 0)
@@ -269,5 +277,9 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         }
 
         return result.concat("]");
+    }
+
+    public String toString() {
+        return _toString();
     }
 }

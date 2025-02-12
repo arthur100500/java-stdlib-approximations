@@ -58,15 +58,20 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         return _getSet()._getStorage().size();
     }
 
-    public int characteristics() {
+    protected int _characteristics() {
         if (this.fence < 0 || this.index == 0 && this.fence == _storageSize())
             return LibSLGlobals.SPLITERATOR_SIZED | LibSLGlobals.SPLITERATOR_DISTINCT;
 
         return LibSLGlobals.SPLITERATOR_DISTINCT;
     }
 
+    @SuppressWarnings("MagicConstant")
+    public int characteristics() {
+        return _characteristics();
+    }
+
     public long estimateSize() {
-        return super.estimateSize();
+        return super._estimateSize();
     }
 
     private int _checkSizeOfUnseenKeys() {
@@ -96,7 +101,7 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         return storage;
     }
 
-    public void forEachRemaining(Consumer<? super E> userAction) {
+    protected void _forEachRemaining(Consumer<? super E> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
@@ -123,11 +128,15 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         _checkForModification();
     }
 
-    public long getExactSizeIfKnown() {
-        return super.getExactSizeIfKnown();
+    public void forEachRemaining(Consumer<? super E> userAction) {
+        _forEachRemaining(userAction);
     }
 
-    public boolean tryAdvance(Consumer<? super E> userAction) {
+    public long getExactSizeIfKnown() {
+        return super._getExactSizeIfKnown();
+    }
+
+    protected boolean _tryAdvance(Consumer<? super E> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
@@ -155,7 +164,11 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         return true;
     }
 
-    public Set_SpliteratorImpl<E> trySplit() {
+    public boolean tryAdvance(Consumer<? super E> userAction) {
+        return _tryAdvance(userAction);
+    }
+
+    protected Set_SpliteratorImpl<E> _trySplit() {
         int hi = _getFence();
         int lo = this.index;
         int mid = (hi + lo) >>> 1;
@@ -175,5 +188,9 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
 
         this.index = mid;
         return new Set_SpliteratorImpl<>(this.set, newSeenKeys, newUnseenKeys, lo, mid, this.expectedModCount);
+    }
+
+    public Set_SpliteratorImpl<E> trySplit() {
+        return _trySplit();
     }
 }

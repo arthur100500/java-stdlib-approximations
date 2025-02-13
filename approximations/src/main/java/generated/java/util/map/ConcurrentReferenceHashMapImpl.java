@@ -20,10 +20,6 @@ public class ConcurrentReferenceHashMapImpl<K, V> extends AbstractMapImpl<K, V> 
 
     private int modCount;
 
-    static {
-        Engine.assume(true);
-    }
-
     public ConcurrentReferenceHashMapImpl() {
         super(true);
     }

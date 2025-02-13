@@ -24,6 +24,10 @@ public class ArrayListImpl<E> extends AbstractListImpl<E> implements RandomAcces
     @Serial
     private static final long serialVersionUID = 8683452581122892189L;
 
+    private SymbolicList<E> storage;
+
+    private int modCount;
+
     static {
         Engine.assume(true);
     }
@@ -46,6 +50,24 @@ public class ArrayListImpl<E> extends AbstractListImpl<E> implements RandomAcces
     @SuppressWarnings("unused")
     public ArrayListImpl(int initialCapacity) {
         super(initialCapacity);
+    }
+
+    public SymbolicList<E> _getStorage() {
+        SymbolicList<E> storage = this.storage;
+        Engine.assume(storage != null);
+        return storage;
+    }
+
+    public void _setStorage(SymbolicList<E> storage) {
+        this.storage = storage;
+    }
+
+    public int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
     }
 
     public boolean add(E e) {

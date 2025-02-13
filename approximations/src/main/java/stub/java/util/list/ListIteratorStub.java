@@ -17,7 +17,7 @@ public class ListIteratorStub<E> extends AbstractIterator<E> implements ListIter
     }
 
     public ListIteratorStub(AbstractListImpl<E> list, int index) {
-        this(list, index, list.modCount);
+        this(list, index, list._getModCount());
         throw new LinkageError();
     }
 

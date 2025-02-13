@@ -78,10 +78,10 @@ public final class Map_KeySetImpl<K, V> extends Map_ContentsSetImpl<K, V, K> {
     @SuppressWarnings("unchecked")
     public boolean remove(Object key) {
         K typedKey = (K) key;
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(typedKey)) {
             storage.remove(typedKey);
-            this.map.modCount++;
+            this.map._incrementModCount();
             return true;
         }
 

@@ -14,6 +14,12 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
 
     public AbstractListImpl<E> list;
 
+    public int index;
+
+    public int fence;
+
+    public int expectedModCount;
+
     protected ListSpliteratorStubImpl(AbstractListImpl<E> list, int index, int fence, int expectedModCount) {
         super(index, fence, expectedModCount);
         Engine.assume(list != null);
@@ -30,12 +36,36 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
         return result;
     }
 
+    protected int _getIndex() {
+        return index;
+    }
+
+    protected void _setIndex(int newIndex) {
+        this.index = newIndex;
+    }
+
+    protected int _getFence() {
+        return fence;
+    }
+
+    protected void _setFence(int newFence) {
+        this.fence = newFence;
+    }
+
+    protected int _getExpectedModCount() {
+        return expectedModCount;
+    }
+
+    protected void _setExpectedModCount(int newExpectedModCount) {
+        this.expectedModCount = newExpectedModCount;
+    }
+
     protected ListSpliteratorStubImpl<E> _create(int index, int fence) {
         return new ListSpliteratorStubImpl<>(this.list, index, fence, this.expectedModCount);
     }
 
     protected int _parentModCount() {
-        return _getList().modCount;
+        return _getList()._getModCount();
     }
 
     protected int _storageSize() {
@@ -60,7 +90,7 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
             throw new NullPointerException();
 
         SymbolicList<E> storage = _getList()._getStorage();
-        int fence = _getFence();
+        int fence = _fence();
         for (int i = this.index; i < fence; i++) {
             E item = storage.get(i);
             _action.accept(item);
@@ -81,7 +111,7 @@ public class ListSpliteratorStubImpl<E> extends AbstractSpliteratorImpl<E> {
         if (_action == null)
             throw new NullPointerException();
 
-        int fence = _getFence();
+        int fence = _fence();
         int current = this.index;
         if (current >= fence)
             return false;

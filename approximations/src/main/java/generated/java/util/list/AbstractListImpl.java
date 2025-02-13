@@ -24,11 +24,9 @@ import runtime.LibSLRuntime;
 @Approximate(java.util.AbstractList.class)
 public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> implements List<E> {
 
-    public SymbolicList<E> storage;
-
     public AbstractListImpl(SymbolicList<E> storage, int modCount) {
         super(modCount);
-        this.storage = storage;
+        _setStorage(storage);
     }
 
     public AbstractListImpl(Collection<? extends E> c) {
@@ -37,7 +35,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         if (c == null)
             throw new NullPointerException();
 
-        this.storage = Engine.makeSymbolicList();
+        _setStorage(Engine.makeSymbolicList());
         _addAllElements(0, c);
     }
 
@@ -47,14 +45,12 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         if (initialCapacity < 0)
             throw new IllegalArgumentException();
 
-        this.storage = Engine.makeSymbolicList();
+        _setStorage(Engine.makeSymbolicList());
     }
 
-    public SymbolicList<E> _getStorage() {
-        SymbolicList<E> storage = this.storage;
-        Engine.assume(storage != null);
-        return storage;
-    }
+    public abstract SymbolicList<E> _getStorage();
+
+    public abstract void _setStorage(SymbolicList<E> storage);
 
     public boolean _isValidIndex(int index, int length) {
         return index >= 0 && index < length;
@@ -101,7 +97,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
             }
         }
 
-        this.modCount++;
+        _incrementModCount();
         return oldLength != storage.size();
     }
 
@@ -116,16 +112,11 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
             throw new IllegalArgumentException();
     }
 
-    public void _checkForModification(int expectedModCount) {
-        if (this.modCount != expectedModCount)
-            throw new ConcurrentModificationException();
-    }
-
     public E _deleteElement(int index) {
         SymbolicList<E> storage = _getStorage();
         E result = storage.get(index);
         storage.remove(index);
-        this.modCount++;
+        _incrementModCount();
         return result;
     }
 
@@ -136,7 +127,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
 
     public void _addElement(int index, E element) {
         _getStorage().insert(index, element);
-        this.modCount++;
+        _incrementModCount();
     }
 
     public void _checkedAddElement(int index, E element) {
@@ -166,9 +157,9 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
     }
 
     public void _replaceAllRange(UnaryOperator<E> op, int i, int end) {
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         SymbolicList<E> storage = _getStorage();
-        while (this.modCount == expectedModCount && i < end) {
+        while (_getModCount() == expectedModCount && i < end) {
             E oldItem = storage.get(i);
             E newItem = op.apply(oldItem);
             storage.set(i, newItem);
@@ -183,7 +174,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
 
         SymbolicList<E> storage = _getStorage();
         int oldLength = storage.size();
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         Engine.assume(start <= end);
         for (int i = end - 1; i > start; i--) {
             E item = storage.get(i);
@@ -271,8 +262,8 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
             if (!complement)
                 return false;
 
-            this.storage = Engine.makeSymbolicList();
-            this.modCount++;
+            _setStorage(Engine.makeSymbolicList());
+            _incrementModCount();
             return true;
         }
 
@@ -311,11 +302,11 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
     @SuppressWarnings("unchecked")
     public void _do_sort(int start, int end, Comparator<? super E> c) {
         if (start >= end) {
-            this.modCount++;
+            _incrementModCount();
             return;
         }
         SymbolicList<E> storage = _getStorage();
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         Engine.assume(start >= 0);
         Engine.assume(end > 0);
         int outerLimit = end - 1;
@@ -337,7 +328,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
     public boolean _add(E e) {
         SymbolicList<E> storage = _getStorage();
         storage.insert(storage.size(), e);
-        this.modCount++;
+        _incrementModCount();
         return true;
     }
 
@@ -355,8 +346,8 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
     }
 
     public void _clear() {
-        this.storage = Engine.makeSymbolicList();
-        this.modCount++;
+        _setStorage(Engine.makeSymbolicList());
+        _incrementModCount();
     }
 
     @SuppressWarnings("unchecked")
@@ -365,8 +356,8 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         SymbolicList<E> storageCopy = Engine.makeSymbolicList();
         SymbolicList<E> storage = _getStorage();
         storage.copy(storageCopy, 0, 0, storage.size());
-        clonedList.storage = storageCopy;
-        clonedList.modCount = 0;
+        clonedList._setStorage(storageCopy);
+        clonedList._setModCount(0);
         return clonedList;
     }
 
@@ -400,7 +391,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
     }
 
     public void _ensureCapacity(int minCapacity) {
-        this.modCount++;
+        _incrementModCount();
     }
 
     @SuppressWarnings("unchecked")
@@ -410,8 +401,8 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
 
         if (other instanceof AbstractListImpl<?>) {
             AbstractListImpl<E> otherList = (AbstractListImpl<E>) other;
-            int expectedModCount = this.modCount;
-            int otherExpectedModCount = otherList.modCount;
+            int expectedModCount = _getModCount();
+            int otherExpectedModCount = otherList._getModCount();
             SymbolicList<E> otherStorage = otherList._getStorage();
             SymbolicList<E> storage = _getStorage();
             int size = storage.size();
@@ -429,10 +420,10 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
         if (_action == null)
             throw new NullPointerException();
 
-        int expectedModCount = this.modCount;
+        int expectedModCount = this._getModCount();
         int i = 0;
         SymbolicList<E> storage = _getStorage();
-        while (this.modCount == expectedModCount && i < storage.size()) {
+        while (this._getModCount() == expectedModCount && i < storage.size()) {
             E item = storage.get(i);
             _action.accept(item);
             i++;
@@ -520,7 +511,7 @@ public abstract class AbstractListImpl<E> extends AbstractCollectionImpl<E> impl
             throw new NullPointerException();
 
         _replaceAllRange(op, 0, _getStorage().size());
-        this.modCount++;
+        _incrementModCount();
     }
 
     public boolean _retainAll(@NotNull Collection<?> c) {

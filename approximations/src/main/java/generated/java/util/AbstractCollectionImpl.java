@@ -13,16 +13,22 @@ import java.util.function.IntFunction;
 @Approximate(java.util.AbstractCollection.class)
 public abstract class AbstractCollectionImpl<E> implements Collection<E> {
 
-    public transient int modCount;
-
     public AbstractCollectionImpl(int modCount) {
-        this.modCount = modCount;
+        _setModCount(modCount);
     }
 
     abstract protected Object[] _mapToArray();
 
-    protected void _checkForModification(int expectedModCount) {
-        if (this.modCount != expectedModCount)
+    abstract public int _getModCount();
+
+    abstract protected void _setModCount(int newModCount);
+
+    public void _incrementModCount() {
+        _setModCount(_getModCount() + 1);
+    }
+
+    public void _checkForModification(int expectedModCount) {
+        if (_getModCount() != expectedModCount)
             throw new ConcurrentModificationException();
     }
 

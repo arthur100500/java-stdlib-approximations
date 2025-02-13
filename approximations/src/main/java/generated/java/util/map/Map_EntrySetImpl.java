@@ -90,12 +90,12 @@ public final class Map_EntrySetImpl<K, V> extends Map_ContentsSetImpl<K, V, Map.
 
         Map.Entry<K, V> typedOtherEntry = (Map.Entry<K, V>) o;
         K key = typedOtherEntry.getKey();
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(key)) {
             Map.Entry<K, V> entry = storage.get(key);
             if (LibSLRuntime.equals(entry, typedOtherEntry)) {
                 storage.remove(key);
-                this.map.modCount++;
+                this.map._incrementModCount();
                 return true;
             }
         }

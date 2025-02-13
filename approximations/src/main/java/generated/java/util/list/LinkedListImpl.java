@@ -30,6 +30,10 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
     @Serial
     private static final long serialVersionUID = 876323262645176354L;
 
+    private SymbolicList<E> storage;
+
+    private int modCount;
+
     static {
         Engine.assume(true);
     }
@@ -48,6 +52,25 @@ public class LinkedListImpl<E> extends AbstractListImpl<E> implements Deque<E>, 
     public LinkedListImpl(Collection<? extends E> c) {
         super(c);
     }
+
+    public SymbolicList<E> _getStorage() {
+        SymbolicList<E> storage = this.storage;
+        Engine.assume(storage != null);
+        return storage;
+    }
+
+    public void _setStorage(SymbolicList<E> storage) {
+        this.storage = storage;
+    }
+
+    public int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
+    }
+
 
     private E _unlinkFirst() {
         if (!_isValidIndex(0))

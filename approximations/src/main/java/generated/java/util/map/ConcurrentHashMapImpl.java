@@ -3,6 +3,7 @@ package generated.java.util.map;
 import org.jacodb.approximation.annotation.Approximate;
 import org.jetbrains.annotations.NotNull;
 import org.usvm.api.Engine;
+import runtime.LibSLRuntime;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,6 +20,10 @@ public class ConcurrentHashMapImpl<K, V> extends AbstractMapImpl<K, V> implement
     @Serial
     private static final long serialVersionUID = 7249069246763182397L;
 
+    private LibSLRuntime.Map<K, Map.Entry<K, V>> storage;
+
+    private int modCount;
+
     static {
         Engine.assume(true);
     }
@@ -28,7 +33,7 @@ public class ConcurrentHashMapImpl<K, V> extends AbstractMapImpl<K, V> implement
         super(true);
     }
 
-    public ConcurrentHashMapImpl(Map<K, V> m) {
+    public ConcurrentHashMapImpl(Map<? extends K, ? extends V> m) {
         super(true, m);
     }
 
@@ -40,6 +45,28 @@ public class ConcurrentHashMapImpl<K, V> extends AbstractMapImpl<K, V> implement
     @SuppressWarnings("unused")
     public ConcurrentHashMapImpl(int initialCapacity, float loadFactor) {
         super(true, initialCapacity, loadFactor);
+    }
+
+    public LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage() {
+        LibSLRuntime.Map<K, Map.Entry<K, V>> result = this.storage;
+        Engine.assume(result != null);
+        return result;
+    }
+
+    public void _setStorage(LibSLRuntime.Map<K, Entry<K, V>> storage) {
+        this.storage = storage;
+    }
+
+    protected int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
+    }
+
+    protected boolean _isHashMap() {
+        return true;
     }
 
     public void clear() {

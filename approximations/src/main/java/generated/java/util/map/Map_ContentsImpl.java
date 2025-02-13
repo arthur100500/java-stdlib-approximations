@@ -24,8 +24,16 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         this.map = map;
     }
 
+    public int _getModCount() {
+        throw new UnsupportedOperationException();
+    }
+
+    protected void _setModCount(int newModCount) {
+        throw new UnsupportedOperationException();
+    }
+
     @SuppressWarnings("DataFlowIssue")
-    LibSLRuntime.Map<K, Map.Entry<K, V>> getStorage() {
+    LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage() {
         Engine.assume(this.map != null);
         return this.map._getStorage();
     }
@@ -34,7 +42,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
 
     protected Object[] _mapToArray() {
         ArrayList<Content> items = new ArrayList<>();
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = storage.duplicate();
         while (true) {
             K curKey = unseen.anyKey();
@@ -63,7 +71,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
     abstract boolean _containsInStorage(LibSLRuntime.Map<K, Map.Entry<K, V>> storage, Object o);
 
     public boolean contains(Object obj) {
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.size() == 0)
             return false;
 
@@ -98,7 +106,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         if (c == null)
             return false;
 
-        if (getStorage().size() != c.size())
+        if (_getStorage().size() != c.size())
             return false;
 
         return containsAll(c);
@@ -108,13 +116,13 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         if (userAction == null)
             throw new NullPointerException();
 
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int size = storage.size();
         if (size == 0)
             return;
 
         Engine.assume(size > 0);
-        int expectedModCount = this.map.modCount;
+        int expectedModCount = this.map._getModCount();
         LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = storage.duplicate();
         for (int i = 0; i < size; i++) {
             K key = unseen.anyKey();
@@ -125,16 +133,16 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
     }
 
     public int hashCode() {
-        return LibSLRuntime.hashCode(getStorage());
+        return LibSLRuntime.hashCode(_getStorage());
     }
 
     public boolean isEmpty() {
-        return getStorage().size() == 0;
+        return _getStorage().size() == 0;
     }
 
     @NotNull
     public Iterator<Content> iterator() {
-        return new Map_Contents_IteratorImpl<>(this, getStorage().duplicate(), this.map.modCount);
+        return new Map_Contents_IteratorImpl<>(this, _getStorage().duplicate(), this.map._getModCount());
     }
 
     @NotNull
@@ -151,7 +159,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         if (c == null)
             throw new NullPointerException();
 
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int startStorageSize = storage.size();
         int cSize = c.size();
         if (startStorageSize == 0 || cSize == 0)
@@ -163,7 +171,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
                 K key = unseen.anyKey();
                 if (c.contains(_contentByKey(storage, key))) {
                     storage.remove(key);
-                    this.map.modCount++;
+                    this.map._incrementModCount();
                 }
                 unseen.remove(key);
             }
@@ -183,7 +191,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         if (filter == null)
             throw new NullPointerException();
 
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int startStorageSize = storage.size();
         if (startStorageSize == 0)
             return false;
@@ -193,7 +201,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
             K curKey = unseen.anyKey();
             if (filter.test(_contentByKey(storage, curKey))) {
                 storage.remove(curKey);
-                this.map.modCount++;
+                this.map._incrementModCount();
             }
             unseen.remove(curKey);
         }
@@ -206,7 +214,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
         if (c == null)
             throw new NullPointerException();
 
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int startStorageSize = storage.size();
         int cSize = c.size();
         if (startStorageSize == 0 || cSize == 0)
@@ -217,7 +225,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
             K curKey = unseen.anyKey();
             if (!c.contains(_contentByKey(storage, curKey))) {
                 storage.remove(curKey);
-                this.map.modCount++;
+                this.map._incrementModCount();
             }
         }
 
@@ -259,7 +267,7 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
     }
 
     protected String _toString() {
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int size = storage.size();
         if (size == 0)
             return "[]";

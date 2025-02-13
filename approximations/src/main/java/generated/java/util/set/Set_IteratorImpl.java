@@ -40,7 +40,7 @@ public final class Set_IteratorImpl<E> extends AbstractIteratorImpl<E> {
     }
 
     protected int _parentModCount() {
-        return _getSet().modCount;
+        return _getSet()._getModCount();
     }
 
     private boolean _isEmpty() {
@@ -85,9 +85,9 @@ public final class Set_IteratorImpl<E> extends AbstractIteratorImpl<E> {
         _checkForModification();
         AbstractSetImpl<E> set = _getSet();
         set._getStorage().remove(key);
-        set.modCount++;
+        set._incrementModCount();
         this.unseen.remove(key);
-        this.expectedModCount = set.modCount;
+        this.expectedModCount = set._getModCount();
         this.currentKey = null;
     }
 }

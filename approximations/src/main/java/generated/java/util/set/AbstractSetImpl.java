@@ -21,10 +21,6 @@ import runtime.LibSLRuntime;
 @Approximate(java.util.AbstractSet.class)
 public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> implements Set<E> {
 
-    public LibSLRuntime.Map<E, Object> storage;
-
-    private boolean isHashSet;
-
     private static <E> LibSLRuntime.Map.Container<E, Object> _createContainer(boolean isHashSet) {
         if (isHashSet)
             return new LibSLRuntime.HashMapContainer<>();
@@ -36,14 +32,13 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         return new LibSLRuntime.Map<>(_createContainer(isHashSet));
     }
 
-    public AbstractSetImpl(LibSLRuntime.Map<E, Object> storage, int modCount, boolean isHashSet) {
+    public AbstractSetImpl(LibSLRuntime.Map<E, Object> storage, int modCount) {
         super(modCount);
-        this.storage = storage;
-        this.isHashSet = isHashSet;
+        _setStorage(storage);
     }
 
     public AbstractSetImpl(boolean isHashSet) {
-        this(_createStorage(isHashSet), 0, isHashSet);
+        this(_createStorage(isHashSet), 0);
     }
 
     @SuppressWarnings("unused")
@@ -59,11 +54,10 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         if (initialCapacity < 0)
             throw new IllegalArgumentException();
 
-        this.storage = _createStorage(isHashSet);
-        this.isHashSet = isHashSet;
+        _setStorage(_createStorage(isHashSet));
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "ExpressionComparedToItself"})
     public AbstractSetImpl(boolean isHashSet, int initialCapacity, float loadFactor) {
         super(0);
 
@@ -73,8 +67,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         if (loadFactor <= 0 || loadFactor != loadFactor)
             throw new IllegalArgumentException();
 
-        this.storage = _createStorage(isHashSet);
-        this.isHashSet = isHashSet;
+        _setStorage(_createStorage(isHashSet));
     }
 
     @SuppressWarnings("unused")
@@ -83,11 +76,11 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         LibSLRuntime.error("Private constructor call");
     }
 
-    public LibSLRuntime.Map<E, Object> _getStorage() {
-        LibSLRuntime.Map<E, Object> storage = this.storage;
-        Engine.assume(storage != null);
-        return storage;
-    }
+    public abstract LibSLRuntime.Map<E, Object> _getStorage();
+
+    public abstract void _setStorage(LibSLRuntime.Map<E, Object> storage);
+
+    abstract protected boolean _isHashSet();
 
     private void _internalAdd(E key) {
         _getStorage().set(key, LibSLGlobals.SOMETHING);
@@ -110,7 +103,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         }
 
         if (lengthBeforeAdd != storage.size()) {
-            this.modCount++;
+            _incrementModCount();
             return true;
         }
 
@@ -140,7 +133,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
 
     public boolean _add(E obj) {
         LibSLRuntime.Map<E, Object> storage = _getStorage();
-        this.modCount++;
+        _incrementModCount();
         if (storage.hasKey(obj))
             return false;
 
@@ -149,15 +142,15 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
     }
 
     public void _clear() {
-        this.storage = _createStorage(this.isHashSet);
-        this.modCount++;
+        _setStorage(_createStorage(_isHashSet()));
+        _incrementModCount();
     }
 
     @SuppressWarnings("unchecked")
     public Object _clone() throws CloneNotSupportedException {
         AbstractSetImpl<E> clonedSet = (AbstractSetImpl<E>) super.clone();
-        clonedSet.modCount = 0;
-        clonedSet.storage = _getStorage().duplicate();
+        clonedSet._setModCount(0);
+        clonedSet._setStorage(_getStorage().duplicate());
         return clonedSet;
     }
 
@@ -176,7 +169,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
     @NotNull
     public Iterator<E> _iterator() {
         LibSLRuntime.Map<E, Object> unseenKeys = _getStorage().duplicate();
-        return new Set_IteratorImpl<>(this.modCount, unseenKeys, this, null);
+        return new Set_IteratorImpl<>(_getModCount(), unseenKeys, this, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -185,7 +178,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         if (storage.hasKey(typedElem)) {
             storage.remove(typedElem);
-            this.modCount++;
+            _incrementModCount();
             return true;
         }
 
@@ -208,9 +201,9 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         if (!(other instanceof Set))
             return false;
 
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         AbstractSetImpl<E> otherSet = (AbstractSetImpl<E>) other;
-        int otherExpectedModCount = otherSet.modCount;
+        int otherExpectedModCount = otherSet._getModCount();
         LibSLRuntime.Map<E, Object> otherStorage = otherSet._getStorage();
 
         LibSLRuntime.Map<E, Object> storage = _getStorage();
@@ -234,7 +227,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
             throw new NullPointerException();
         }
 
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         int otherSize = c.size();
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         int lengthBeforeRemoving = storage.size();
@@ -257,7 +250,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
             }
         }
         _checkForModification(expectedModCount);
-        this.modCount++;
+        _incrementModCount();
         return lengthBeforeRemoving != storage.size();
     }
 
@@ -307,7 +300,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
             i++;
         }
         if (lengthBeforeAdd != storage.size()) {
-            this.modCount++;
+            _incrementModCount();
             return true;
         }
 
@@ -320,7 +313,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
 
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         int lengthBeforeAdd = storage.size();
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         LibSLRuntime.Map<E, Object> unseenKeys = storage.duplicate();
         int i = 0;
         while (i < lengthBeforeAdd) {
@@ -332,7 +325,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
         }
         _checkForModification(expectedModCount);
         if (lengthBeforeAdd != storage.size()) {
-            this.modCount++;
+            _incrementModCount();
             return true;
         }
 
@@ -345,7 +338,7 @@ public abstract class AbstractSetImpl<E> extends AbstractCollectionImpl<E> imple
 
         LibSLRuntime.Map<E, Object> storage = _getStorage();
         int count = storage.size();
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         LibSLRuntime.Map<E, Object> unseenKeys = storage.duplicate();
         int i = 0;
         while (i < count) {

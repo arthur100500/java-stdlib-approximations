@@ -78,8 +78,9 @@ public class LinkedHashSetImpl<E> extends HashSetImpl<E> implements Cloneable, S
         return super.spliterator();
     }
 
+    @SuppressWarnings("EqualsDoesntCheckParameterClass")
     public boolean equals(Object other) {
-        return Engine.typeIs(other, LinkedHashSetImpl.class) && super.equals(other);
+        return Engine.typeIs(other, LinkedHashSetImpl.class) && super._equals(other);
     }
 
     public int hashCode() {

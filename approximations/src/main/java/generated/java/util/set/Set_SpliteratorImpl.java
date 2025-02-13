@@ -22,6 +22,12 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
 
     SymbolicList<E> unseenKeys;
 
+    public int index;
+
+    public int fence;
+
+    public int expectedModCount;
+
     Set_SpliteratorImpl(
         AbstractSetImpl<E> set,
         SymbolicList<E> seenKeys,
@@ -40,6 +46,30 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         this(set, Engine.makeSymbolicList(), null, 0, -1, 0);
     }
 
+    protected int _getIndex() {
+        return index;
+    }
+
+    protected void _setIndex(int newIndex) {
+        this.index = newIndex;
+    }
+
+    protected int _getFence() {
+        return fence;
+    }
+
+    protected void _setFence(int newFence) {
+        this.fence = newFence;
+    }
+
+    protected int _getExpectedModCount() {
+        return expectedModCount;
+    }
+
+    protected void _setExpectedModCount(int newExpectedModCount) {
+        this.expectedModCount = newExpectedModCount;
+    }
+
     protected AbstractSpliteratorImpl<E> _create(int index, int fence) {
         return null;
     }
@@ -51,7 +81,7 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
     }
 
     protected int _parentModCount() {
-        return _getSet().modCount;
+        return _getSet()._getModCount();
     }
 
     protected int _storageSize() {
@@ -105,7 +135,7 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         if (userAction == null)
             throw new NullPointerException();
 
-        int fence = _getFence();
+        int fence = _fence();
         if (unseenKeys != null) {
             _checkSizeOfSeenKeys();
             int size = _checkSizeOfUnseenKeys();
@@ -140,7 +170,7 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
         if (userAction == null)
             throw new NullPointerException();
 
-        int hi = _getFence();
+        int hi = _fence();
         if (this.index >= hi)
             return false;
 
@@ -169,7 +199,7 @@ public final class Set_SpliteratorImpl<E> extends AbstractSpliteratorImpl<E> {
     }
 
     protected Set_SpliteratorImpl<E> _trySplit() {
-        int hi = _getFence();
+        int hi = _fence();
         int lo = this.index;
         int mid = (hi + lo) >>> 1;
         if (lo >= mid)

@@ -53,6 +53,21 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         this(list, null, fromIndex, toIndex - fromIndex, 0);
     }
 
+    public SymbolicList<E> _getStorage() {
+        return null;
+    }
+
+    public void _setStorage(SymbolicList<E> storage) {
+    }
+
+    public int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
+    }
+
     public AbstractListImpl<E> _getList() {
         AbstractListImpl<E> result = this.list;
         Engine.assume(result != null);
@@ -84,7 +99,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
     public void _updateSizeAndModCount(int sizeChange) {
         this.length += sizeChange;
         AbstractListImpl<E> list = _getList();
-        this.modCount = list.modCount;
+        this.modCount = list._getModCount();
         SubListImpl<E> parentSubList = this.parentSubList;
         while (parentSubList != null) {
             parentSubList.length += sizeChange;
@@ -177,7 +192,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         for (int i = start; i > end; i--) {
             rootStorage.remove(i);
         }
-        list.modCount++;
+        list._incrementModCount();
         _updateSizeAndModCount(-size);
     }
 
@@ -256,7 +271,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         Engine.assume(this.length > 0);
         AbstractListImpl<E> list = _getList();
         SymbolicList<E> rootStorage = list._getStorage();
-        int expectedModCount = list.modCount;
+        int expectedModCount = list._getModCount();
         this.modCount = expectedModCount;
         int end = _endIndex();
         list._checkForModification(expectedModCount);
@@ -328,6 +343,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return new SubListIteratorStubImpl<>(this, index);
     }
 
+    @NotNull
     public Stream<E> parallelStream() {
         return _makeStream(true);
     }
@@ -360,7 +376,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return _batchRemove(c, false);
     }
 
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@NotNull Predicate<? super E> filter) {
         AbstractListImpl<E> list = _getList();
         list._checkForModification(this.modCount);
         if (isEmpty())
@@ -377,7 +393,8 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return false;
     }
 
-    public void replaceAll(UnaryOperator<E> operator) {
+    @SuppressWarnings("ConstantValue")
+    public void replaceAll(@NotNull UnaryOperator<E> operator) {
         if (operator == null)
             throw new NullPointerException();
 
@@ -408,13 +425,15 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
     public void sort(Comparator<? super E> c) {
         AbstractListImpl<E> list = _getList();
         list._do_sort(this.offset, _endIndex(), c);
-        this.modCount = list.modCount;
+        this.modCount = list._getModCount();
     }
 
+    @NotNull
     public Spliterator<E> spliterator() {
         return new SubListSpliteratorStubImpl<>(this);
     }
 
+    @NotNull
     public Stream<E> stream() {
         return _makeStream(false);
     }

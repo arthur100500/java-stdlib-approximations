@@ -14,12 +14,17 @@ import java.util.stream.Stream;
 import org.jacodb.approximation.annotation.Approximate;
 import org.jetbrains.annotations.NotNull;
 import org.usvm.api.Engine;
+import runtime.LibSLRuntime;
 
 @Approximate(java.util.HashSet.class)
 public class HashSetImpl<E> extends AbstractSetImpl<E> implements Cloneable, Serializable {
 
     @Serial
     private static final long serialVersionUID = -5024744406713321676L;
+
+    private LibSLRuntime.Map<E, Object> storage;
+
+    private int modCount;
 
     static {
         Engine.assume(true);
@@ -44,6 +49,28 @@ public class HashSetImpl<E> extends AbstractSetImpl<E> implements Cloneable, Ser
     @SuppressWarnings("unused")
     private HashSetImpl(int initialCapacity, float loadFactor, boolean dummy) {
         super(initialCapacity, loadFactor, dummy);
+    }
+
+    public LibSLRuntime.Map<E, Object> _getStorage() {
+        LibSLRuntime.Map<E, Object> storage = this.storage;
+        Engine.assume(storage != null);
+        return storage;
+    }
+
+    public void _setStorage(LibSLRuntime.Map<E, Object> storage) {
+        this.storage = storage;
+    }
+
+    protected boolean _isHashSet() {
+        return true;
+    }
+
+    public int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
     }
 
     public boolean add(E obj) {

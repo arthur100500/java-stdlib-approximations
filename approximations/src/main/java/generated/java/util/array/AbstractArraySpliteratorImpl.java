@@ -14,9 +14,39 @@ public abstract class AbstractArraySpliteratorImpl<E> extends AbstractSpliterato
 
     public int characteristics;
 
+    public int index;
+
+    public int fence;
+
+    public int expectedModCount;
+
     public AbstractArraySpliteratorImpl(int index, int fence, int characteristics) {
         super(index, fence, 0);
         this.characteristics = characteristics | SpliteratorsImpl._characteristics;
+    }
+
+    protected int _getIndex() {
+        return index;
+    }
+
+    protected void _setIndex(int newIndex) {
+        this.index = newIndex;
+    }
+
+    protected int _getFence() {
+        return fence;
+    }
+
+    protected void _setFence(int newFence) {
+        this.fence = newFence;
+    }
+
+    protected int _getExpectedModCount() {
+        return expectedModCount;
+    }
+
+    protected void _setExpectedModCount(int newExpectedModCount) {
+        this.expectedModCount = newExpectedModCount;
     }
 
     protected int _parentModCount() {
@@ -27,7 +57,7 @@ public abstract class AbstractArraySpliteratorImpl<E> extends AbstractSpliterato
         return this.fence;
     }
 
-    protected int _getFence() {
+    protected int _fence() {
         return this.fence;
     }
 

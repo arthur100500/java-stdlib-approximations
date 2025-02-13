@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.usvm.api.Engine;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -85,5 +86,10 @@ public class ModelMapImpl extends LinkedHashMapImpl<String, Object> {
             SpringApplicationImpl._internalLog("mergeAttributes, lastKey = ", lastKey);
         }
         return this;
+    }
+
+    @SuppressWarnings("EqualsDoesntCheckParameterClass")
+    public boolean equals(Object other) {
+        return Engine.typeIs(other, ModelMapImpl.class) && super._equals(other);
     }
 }

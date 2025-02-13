@@ -14,12 +14,17 @@ import java.util.function.Function;
 import org.jacodb.approximation.annotation.Approximate;
 import org.jetbrains.annotations.NotNull;
 import org.usvm.api.Engine;
+import runtime.LibSLRuntime;
 
 @Approximate(java.util.HashMap.class)
 public class HashMapImpl<K, V> extends AbstractMapImpl<K, V> implements Cloneable, Serializable {
 
     @Serial
     private static final long serialVersionUID = 362498820763181265L;
+
+    private LibSLRuntime.Map<K, Map.Entry<K, V>> storage;
+
+    private int modCount;
 
     static {
         Engine.assume(true);
@@ -42,6 +47,28 @@ public class HashMapImpl<K, V> extends AbstractMapImpl<K, V> implements Cloneabl
     @SuppressWarnings("unused")
     public HashMapImpl(int initialCapacity, float loadFactor) {
         super(true, initialCapacity, loadFactor);
+    }
+
+    public LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage() {
+        LibSLRuntime.Map<K, Map.Entry<K, V>> result = this.storage;
+        Engine.assume(result != null);
+        return result;
+    }
+
+    public void _setStorage(LibSLRuntime.Map<K, Entry<K, V>> storage) {
+        this.storage = storage;
+    }
+
+    protected int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
+    }
+
+    protected boolean _isHashMap() {
+        return true;
     }
 
     public void clear() {

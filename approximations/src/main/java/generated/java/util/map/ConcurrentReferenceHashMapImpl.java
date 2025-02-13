@@ -4,6 +4,7 @@ import org.jacodb.approximation.annotation.Approximate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrentReferenceHashMap;
+import org.usvm.api.Engine;
 import runtime.LibSLRuntime;
 
 import java.util.Collection;
@@ -14,6 +15,14 @@ import java.util.concurrent.ConcurrentMap;
 @SuppressWarnings("unused")
 @Approximate(org.springframework.util.ConcurrentReferenceHashMap.class)
 public class ConcurrentReferenceHashMapImpl<K, V> extends AbstractMapImpl<K, V> implements ConcurrentMap<K, V> {
+
+    private LibSLRuntime.Map<K, Map.Entry<K, V>> storage;
+
+    private int modCount;
+
+    static {
+        Engine.assume(true);
+    }
 
     public ConcurrentReferenceHashMapImpl() {
         super(true);
@@ -47,6 +56,28 @@ public class ConcurrentReferenceHashMapImpl<K, V> extends AbstractMapImpl<K, V> 
         this(initialCapacity, loadFactor);
     }
 
+    public LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage() {
+        LibSLRuntime.Map<K, Map.Entry<K, V>> result = this.storage;
+        Engine.assume(result != null);
+        return result;
+    }
+
+    public void _setStorage(LibSLRuntime.Map<K, Entry<K, V>> storage) {
+        this.storage = storage;
+    }
+
+    protected int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
+    }
+
+    protected boolean _isHashMap() {
+        return true;
+    }
+
     @Nullable
     public V get(@Nullable Object key) {
         return super._get(key);
@@ -63,6 +94,15 @@ public class ConcurrentReferenceHashMapImpl<K, V> extends AbstractMapImpl<K, V> 
 
     public boolean containsValue(Object value) {
         return super._containsValue(value);
+    }
+
+    @SuppressWarnings("EqualsDoesntCheckParameterClass")
+    public boolean equals(Object other) {
+        return Engine.typeIs(other, ConcurrentHashMapImpl.class) && super._equals(other);
+    }
+
+    public int hashCode() {
+        return super._hashCode();
     }
 
     @Nullable

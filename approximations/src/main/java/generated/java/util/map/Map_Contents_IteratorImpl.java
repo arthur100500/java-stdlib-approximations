@@ -43,7 +43,7 @@ public class Map_Contents_IteratorImpl<K, V, Content> extends AbstractIteratorIm
     }
 
     protected int _parentModCount() {
-        return _getMap().modCount;
+        return _getMap()._getModCount();
     }
 
     private boolean _isEmpty() {
@@ -92,9 +92,9 @@ public class Map_Contents_IteratorImpl<K, V, Content> extends AbstractIteratorIm
         _checkForModification();
         AbstractMapImpl<K, V> map = _getMap();
         map._getStorage().remove(key);
-        map.modCount++;
+        map._incrementModCount();
         this.unseen.remove(key);
-        this.expectedModCount = map.modCount;
+        this.expectedModCount = map._getModCount();
         this.currentKey = null;
     }
 }

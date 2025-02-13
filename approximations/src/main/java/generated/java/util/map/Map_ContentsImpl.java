@@ -25,11 +25,10 @@ public abstract class Map_ContentsImpl<K, V, Content> extends AbstractCollection
     }
 
     public int _getModCount() {
-        throw new UnsupportedOperationException();
+        return 0;
     }
 
     protected void _setModCount(int newModCount) {
-        throw new UnsupportedOperationException();
     }
 
     @SuppressWarnings("DataFlowIssue")

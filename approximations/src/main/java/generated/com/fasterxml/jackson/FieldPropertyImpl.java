@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.util.Annotations;
+import generated.org.springframework.boot.SpringApplicationImpl;
 import org.jacodb.approximation.annotation.Approximate;
 
 import java.io.IOException;
@@ -34,6 +35,9 @@ public abstract class FieldPropertyImpl extends SettableBeanProperty {
         // TODO: Make symbolic
         boolean isNull = false;
         Object value;
+
+        SpringApplicationImpl._println(String.format("[Deserializing (deserializeAndSet) (FieldPropertyImpl)] Setting %s", this));
+
         if (isNull) {
             value = _nullProvider.getNullValue(ctxt);
         } else if (_valueTypeDeserializer == null) {

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.deser.impl.MethodProperty;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.util.Annotations;
+import generated.org.springframework.boot.SpringApplicationImpl;
 import org.jacodb.approximation.annotation.Approximate;
 
 import java.io.IOException;
@@ -26,9 +27,13 @@ public abstract class MethodPropertyImpl extends SettableBeanProperty {
     @Override
     public void deserializeAndSet(JsonParser p, DeserializationContext ctxt, Object instance) throws IOException
     {
+        // TODO: Make it working with non-symbolic deserialization
         // TODO: Make symbolic
         boolean isNull = false;
         Object value;
+
+        SpringApplicationImpl._println(String.format("[Deserializing (deserializeAndSet) (MethodPropertyImpl)] Setting %s", this));
+
         if (isNull) {
             value = _nullProvider.getNullValue(ctxt);
         } else if (_valueTypeDeserializer == null) {

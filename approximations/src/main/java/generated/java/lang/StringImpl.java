@@ -3,6 +3,7 @@ package generated.java.lang;
 import java.io.Serializable;
 import java.lang.Object;
 import java.lang.StringIndexOutOfBoundsException;
+import java.util.Arrays;
 
 import org.jacodb.approximation.annotation.Approximate;
 import org.usvm.api.Engine;
@@ -253,7 +254,7 @@ public class StringImpl implements Serializable {
 
     public byte[] getBytes() {
         _assumeInvariants();
-        return this.value;
+        return Arrays.copyOf(this.value, this.value.length);
     }
 
     public void getBytes(int srcBegin, int srcEnd, byte[] dst, int dstBegin) {

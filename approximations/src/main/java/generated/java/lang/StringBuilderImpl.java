@@ -14,6 +14,7 @@ import java.lang.OutOfMemoryError;
 import java.lang.String;
 import java.lang.StringBuffer;
 import java.lang.StringIndexOutOfBoundsException;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import generated.java.util.stream.IntStreamImpl;
@@ -88,6 +89,18 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
         return LibSLRuntime.toString(seq);
     }
 
+    private static byte[] _getBytesOfSeq(CharSequence seq) {
+        if (seq instanceof String)
+            return ((String) seq).getBytes();
+
+        if (seq instanceof StringBuilderImpl) {
+            StringBuilderImpl sb = (StringBuilderImpl) seq;
+            return Arrays.copyOf(sb.value, sb.byteCount);
+        }
+
+        return LibSLRuntime.toString(seq).getBytes();
+    }
+
     private static CharSequence _getCharSequence(CharSequence seq) {
         if (seq == null)
             return "null";
@@ -151,8 +164,7 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
         int byteSeqStart = _charPosToBytePos(seqStart);
         int byteSeqEnd = _charPosToBytePos(seqEnd);
         int byteSeqLength = _getByteSeqLength(byteCount, byteSeqStart, byteSeqEnd);
-        String str = _getString(seq);
-        byte[] bytes = str.getBytes();
+        byte[] bytes = _getBytesOfSeq(seq);
         LibSLRuntime.ArrayActions.copy(bytes, byteSeqStart, this.value, byteCount, byteSeqLength);
         this.byteCount += byteSeqLength;
     }
@@ -219,8 +231,7 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
                 LibSLRuntime.ArrayActions.copy(this.value, byteOffset, this.value, byteOffset + byteLength, rightLeftovers);
         }
 
-        String str = _getString(seq);
-        byte[] bytes = str.getBytes();
+        byte[] bytes = _getBytesOfSeq(seq);
         LibSLRuntime.ArrayActions.copy(bytes, byteSeqStart, this.value, byteOffset, byteLength);
         this.byteCount += byteLength;
     }

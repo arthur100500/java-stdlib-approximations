@@ -434,7 +434,7 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
         if (index < 0 || index >= this.byteCount)
             throw new StringIndexOutOfBoundsException();
 
-        return (char) value[index];
+        return StringImpl._bytesToChar(value, index);
     }
 
     @NotNull
@@ -444,7 +444,7 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
         int len = this.byteCount;
         int[] intValues = new int[len];
         for (int i = 0; i < len; i++) {
-            intValues[i] = value[i];
+            intValues[i] = StringImpl._bytesToChar(value, i);
         }
 
         return new IntStreamImpl(intValues);
@@ -485,7 +485,7 @@ public final class StringBuilderImpl implements Serializable, Comparable<StringB
         int len = this.byteCount;
         int[] intValues = new int[len];
         for (int i = 0; i < len; i++) {
-            intValues[i] = value[i];
+            intValues[i] = StringImpl._bytesToChar(value, i);
         }
         return new IntStreamImpl(intValues);
     }

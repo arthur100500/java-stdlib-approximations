@@ -71,9 +71,13 @@ public class StringImpl implements Serializable {
         return (char) (((char) fst) | (((char) snd) << 8));
     }
 
+    public static char _charFromByte(byte b) {
+        return (char) (((int) b) & 0xFF);
+    }
+
     public static char _bytesToChar(byte[] bytes, int bytePos) {
         if (COMPACT_STRINGS)
-            return (char) bytes[bytePos];
+            return _charFromByte(bytes[bytePos]);
 
         return _charFrom2Bytes(bytes[bytePos], bytes[bytePos + 1]);
     }
@@ -115,7 +119,7 @@ public class StringImpl implements Serializable {
         if (COMPACT_STRINGS) {
             for (int i = 0; i < bytes.length; i++) {
                 byte c = bytes[i];
-                chars[i] = (char) bytes[i];
+                chars[i] = _charFromByte(bytes[i]);
             }
         } else {
             int byteIndex = 0;

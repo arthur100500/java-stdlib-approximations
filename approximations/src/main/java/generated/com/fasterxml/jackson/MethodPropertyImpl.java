@@ -1,6 +1,7 @@
 package generated.com.fasterxml.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
@@ -8,9 +9,12 @@ import com.fasterxml.jackson.databind.deser.impl.FieldProperty;
 import com.fasterxml.jackson.databind.deser.impl.MethodProperty;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.ser.BeanSerializer;
 import com.fasterxml.jackson.databind.util.Annotations;
 import generated.org.springframework.boot.SpringApplicationImpl;
+import generated.org.springframework.boot.SymbolicValueFactory;
 import org.jacodb.approximation.annotation.Approximate;
+import org.usvm.api.Engine;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -27,12 +31,13 @@ public abstract class MethodPropertyImpl extends SettableBeanProperty {
     @Override
     public void deserializeAndSet(JsonParser p, DeserializationContext ctxt, Object instance) throws IOException
     {
-        // TODO: Make it working with non-symbolic deserialization
-        // TODO: Make symbolic
-        boolean isNull = false;
-        Object value;
+        if (BeanDeserializerImpl._concreteDeserialization()) {
+            deserializeAndSetReal(p, ctxt, instance);
+            return;
+        }
 
-        SpringApplicationImpl._println(String.format("[Deserializing (deserializeAndSet) (MethodPropertyImpl)] Setting %s", this));
+        boolean isNull = Engine.makeSymbolicBoolean();
+        Object value;
 
         if (isNull) {
             value = _nullProvider.getNullValue(ctxt);
@@ -40,6 +45,43 @@ public abstract class MethodPropertyImpl extends SettableBeanProperty {
             value = _valueDeserializer.deserialize(p, ctxt);
             // 04-May-2018, tatu: [databind#2023] Coercion from String (mostly) can give null
             if (value == null) {
+                value = _nullProvider.getNullValue(ctxt);
+            }
+        } else {
+            value = _valueDeserializer.deserializeWithType(p, ctxt, _valueTypeDeserializer);
+        }
+        try {
+            ((MethodProperty)(Object)(this)).set(instance, value);
+        } catch (Exception e) {
+            _throwAsIOE(p, e, value);
+        }
+    }
+
+
+    public void deserializeAndSetReal(JsonParser p, DeserializationContext ctxt,
+                                  Object instance) throws IOException
+    {
+        boolean _skipNulls;
+
+        try {
+            _skipNulls = MethodProperty.class.getDeclaredField("_skipNulls").getBoolean(this);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+
+        Object value;
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            if (_skipNulls) {
+                return;
+            }
+            value = _nullProvider.getNullValue(ctxt);
+        } else if (_valueTypeDeserializer == null) {
+            value = _valueDeserializer.deserialize(p, ctxt);
+            // 04-May-2018, tatu: [databind#2023] Coercion from String (mostly) can give null
+            if (value == null) {
+                if (_skipNulls) {
+                    return;
+                }
                 value = _nullProvider.getNullValue(ctxt);
             }
         } else {

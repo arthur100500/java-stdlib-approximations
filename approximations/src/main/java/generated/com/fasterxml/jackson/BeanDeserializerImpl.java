@@ -2,23 +2,19 @@ package generated.com.fasterxml.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBase;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
-import com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap;
 import generated.org.springframework.boot.SpringApplicationImpl;
 import generated.org.springframework.boot.SymbolicValueFactory;
 import org.jacodb.approximation.annotation.Approximate;
-import org.usvm.api.Engine;
+import stub.java.util.map.RequestMap;
 
 import java.io.IOException;
 import java.io.Serial;
-import java.lang.reflect.Type;
 import java.util.*;
 
 @Approximate(BeanDeserializer.class)
@@ -31,9 +27,8 @@ public class BeanDeserializerImpl extends BeanDeserializer {
         super(src);
     }
 
-    public static boolean _symbolicDeserialization = true;
-    public static int _iteration;
-    public final static int MAX_ITERATION = 10;
+    public static int _iteration = 0;
+    public final static int MAX_ITERATION = 1;
 
     private boolean _isJsonPrimitive(JavaType type) {
         return _isJsonPrimitive(type.getRawClass());
@@ -43,16 +38,21 @@ public class BeanDeserializerImpl extends BeanDeserializer {
         // Here are types like Integer string etc.
         // Currently only int and string
         List<Class<?>> primitives = Arrays.asList(String.class, Integer.class, Boolean.class);
-        boolean isPrimitive = primitives.contains(clazz) || clazz.isPrimitive();
+        return primitives.contains(clazz) || clazz.isPrimitive();
+    }
 
-        SpringApplicationImpl._println(String.format("[Deserializing (_isJsonPrimitive)] %s is primitive: %b", clazz, isPrimitive));
+    private void _writeToState(Object root) {
+        new RequestMap("BODY").set("", root);
+    }
 
-        return isPrimitive;
+    public static boolean _concreteDeserialization() {
+        // Returns false with JcApproximations inside interesting methods
+        return true;
     }
 
     public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException
     {
-        if (!_symbolicDeserialization)
+        if (_concreteDeserialization())
             return deserializeReal(p, ctxt);
 
         boolean isFirstRun = _iteration == 0;
@@ -64,6 +64,7 @@ public class BeanDeserializerImpl extends BeanDeserializer {
         Object empty = _valueInstantiator.createUsingDefault(ctxt);
         Class<?> clazz = empty.getClass();
 
+        // Forks a lot on building string
         SpringApplicationImpl._println(String.format("[Deserializing (deserialize)] Iteration: %d; Type: %s", _iteration, clazz));
 
         Object result;
@@ -73,19 +74,23 @@ public class BeanDeserializerImpl extends BeanDeserializer {
         else
             result = deserializeFromObject(p, ctxt);
 
-        if (isFirstRun) _iteration = 0;
+        if (isFirstRun) {
+            _iteration = 0;
+            _writeToState(result);
+        }
 
         return result;
     }
     
     public Object deserializeFromObject(JsonParser p, DeserializationContext ctxt) throws IOException {
-        if (!_symbolicDeserialization)
+        if (_concreteDeserialization())
             return deserializeFromObjectReal(p, ctxt);
 
         final Object bean = _valueInstantiator.createUsingDefault(ctxt);
         final Class<?> clazz = bean.getClass();
 
-        SpringApplicationImpl._println(String.format("[Deserializing (deserializeFromObject)] Iteration: %d; Type: %s", _iteration, clazz));
+        // Forks a lot on building string
+        // SpringApplicationImpl._println(String.format("[Deserializing (deserializeFromObject)] Iteration: %d; Type: %s", _iteration, clazz));
 
         for (SettableBeanProperty property : _beanProperties) {
             if (_isJsonPrimitive(property.getType()))

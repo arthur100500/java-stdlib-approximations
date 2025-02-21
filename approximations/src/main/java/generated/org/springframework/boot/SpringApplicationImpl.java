@@ -7,12 +7,18 @@ import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Service;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.usvm.api.Engine;
+import stub.java.util.map.RequestMap;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import java.util.*;
 
@@ -45,6 +51,26 @@ public class SpringApplicationImpl {
         return new ArrayList<>();
     }
 
+    private static void _writeToState(String prefix, Object v) {
+        new RequestMap(prefix).set("", v);
+    }
+
+    private static void _fillSecurityHeaders() {
+        // Define headers here
+        RequestMap headers = new RequestMap("HEADERS");
+        headers.set("AUTHORIZATION", null);
+    }
+
+    private static UserDetails _createSymbolicUser() {
+        String username = new RequestMap("USER").get("USERNAME");
+        String password = new RequestMap("USER").get("PASSWORD");
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        Engine.assume(username != null && !username.isEmpty());
+        Engine.assume(password != null && !password.isEmpty());
+        return new User(username, password, authorities);
+    }
+
+
     @SuppressWarnings("unchecked")
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         // TODO: care about conditional beans
@@ -73,25 +99,13 @@ public class SpringApplicationImpl {
                         List<Object> properties = paths.get(path);
                         String kind = (String) properties.get(0);
                         Integer paramCount = (Integer) properties.get(1);
-//                        List<Class<Object>> paramTypes = (List<Class<Object>>) properties.get(1);
-//                        // TODO: if primitive, make default values! #CM
-//                        Object[] pathArgs = new Object[paramTypes.size()];
-//                        for (int i = 0; i < pathArgs.length; i++) {
-//                            pathArgs[i] = LibSLRuntime.DefaultValues.getDefaultValue(paramTypes.get(i));
-//                        }
                         Object[] pathArgs = new Object[paramCount];
                         Arrays.fill(pathArgs, 0);
+                        UserDetails userDetails = _createSymbolicUser();
+                        _fillSecurityHeaders();
                         try {
-                            if (kind.equals("get"))
-                                mockMvc.perform(get(path, pathArgs));
-                            if (kind.equals("post"))
-                                mockMvc.perform(post(path, pathArgs));
-                            if (kind.equals("put"))
-                                mockMvc.perform(put(path, pathArgs));
-                            if (kind.equals("delete"))
-                                mockMvc.perform(delete(path, pathArgs));
-                            if (kind.equals("patch"))
-                                mockMvc.perform(patch(path, pathArgs));
+                            HttpMethod method = HttpMethod.valueOf(kind);
+                            mockMvc.perform(request(method, path, pathArgs).with(user(userDetails)));
                             _internalLog("[USVM] end of path analysis", path);
                         } catch (Throwable e) {
                             _internalLog("[USVM] analysis finished with exception", path);

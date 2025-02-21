@@ -22,6 +22,12 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
 
     SymbolicList<K> unseenKeys;
 
+    public int index;
+
+    public int fence;
+
+    public int expectedModCount;
+
     Map_Contents_SpliteratorImpl(
         Map_ContentsImpl<K, V, Content> contents,
         SymbolicList<K> seenKeys,
@@ -38,6 +44,30 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
 
     public Map_Contents_SpliteratorImpl(Map_ContentsImpl<K, V, Content> contents) {
         this(contents, Engine.makeSymbolicList(), null, 0, -1, 0);
+    }
+
+    protected int _getIndex() {
+        return index;
+    }
+
+    protected void _setIndex(int newIndex) {
+        this.index = newIndex;
+    }
+
+    protected int _getFence() {
+        return fence;
+    }
+
+    protected void _setFence(int newFence) {
+        this.fence = newFence;
+    }
+
+    protected int _getExpectedModCount() {
+        return expectedModCount;
+    }
+
+    protected void _setExpectedModCount(int newExpectedModCount) {
+        this.expectedModCount = newExpectedModCount;
     }
 
     protected AbstractSpliteratorImpl<Content> _create(int index, int fence) {
@@ -67,26 +97,31 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
     }
 
     protected int _parentModCount() {
-        return _getMap().modCount;
+        return _getMap()._getModCount();
     }
 
     protected int _storageSize() {
-        return _getContents().getStorage().size();
+        return _getContents()._getStorage().size();
     }
 
     protected int _defaultCharacteristics() {
         return 0;
     }
 
-    public int characteristics() {
+    protected int _characteristics() {
         if (this.fence < 0 || this.index == 0 && this.fence == _storageSize())
             return LibSLGlobals.SPLITERATOR_SIZED | _defaultCharacteristics();
 
         return _defaultCharacteristics();
     }
 
+    @SuppressWarnings("MagicConstant")
+    public int characteristics() {
+        return _characteristics();
+    }
+
     public long estimateSize() {
-        return super.estimateSize();
+        return super._estimateSize();
     }
 
     private int _checkSizeOfUnseenKeys() {
@@ -106,7 +141,7 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
     }
 
     private LibSLRuntime.Map<K, Map.Entry<K, V>> _removeSeenKeys() {
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getContents().getStorage().duplicate();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getContents()._getStorage().duplicate();
         int size = _checkSizeOfSeenKeys();
         for (int i = 0; i < size; i++) {
             K key = seenKeys.get(i);
@@ -116,16 +151,16 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         return storage;
     }
 
-    public void forEachRemaining(Consumer<? super Content> userAction) {
+    protected void _forEachRemaining(Consumer<? super Content> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
-        int fence = _getFence();
+        int fence = _fence();
         Map_ContentsImpl<K, V, Content> contents = _getContents();
         if (unseenKeys != null) {
             _checkSizeOfSeenKeys();
             int size = _checkSizeOfUnseenKeys();
-            LibSLRuntime.Map<K, Map.Entry<K, V>> storage = contents.getStorage();
+            LibSLRuntime.Map<K, Map.Entry<K, V>> storage = contents._getStorage();
             for (int i = 0; i < size; i++) {
                 K key = unseenKeys.get(i);
                 userAction.accept(contents._contentByKey(storage, key));
@@ -145,15 +180,19 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         _checkForModification();
     }
 
-    public long getExactSizeIfKnown() {
-        return super.getExactSizeIfKnown();
+    public void forEachRemaining(Consumer<? super Content> userAction) {
+        _forEachRemaining(userAction);
     }
 
-    public boolean tryAdvance(Consumer<? super Content> userAction) {
+    public long getExactSizeIfKnown() {
+        return super._getExactSizeIfKnown();
+    }
+
+    protected boolean _tryAdvance(Consumer<? super Content> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
-        int hi = _getFence();
+        int hi = _fence();
         if (this.index >= hi)
             return false;
 
@@ -162,7 +201,7 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
             _checkSizeOfSeenKeys();
             _checkSizeOfUnseenKeys();
             K key = unseenKeys.get(0);
-            LibSLRuntime.Map<K, Map.Entry<K, V>> storage = contents.getStorage();
+            LibSLRuntime.Map<K, Map.Entry<K, V>> storage = contents._getStorage();
             userAction.accept(contents._contentByKey(storage, key));
             unseenKeys.remove(0);
             seenKeys.insert(this.index, key);
@@ -179,8 +218,12 @@ public class Map_Contents_SpliteratorImpl<K, V, Content> extends AbstractSpliter
         return true;
     }
 
+    public boolean tryAdvance(Consumer<? super Content> userAction) {
+        return _tryAdvance(userAction);
+    }
+
     public Map_Contents_SpliteratorImpl<K, V, Content> trySplit() {
-        int hi = _getFence();
+        int hi = _fence();
         int lo = this.index;
         int mid = (hi + lo) >>> 1;
         if (lo >= mid)

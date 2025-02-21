@@ -2,14 +2,14 @@ package decoders.java.util;
 
 import org.jacodb.api.jvm.*;
 import org.usvm.api.SymbolicMap;
-import org.usvm.api.decoder.DecoderApi;
-import org.usvm.api.decoder.DecoderFor;
-import org.usvm.api.decoder.ObjectData;
-import org.usvm.api.decoder.ObjectDecoder;
+import org.usvm.api.decoder.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import static org.usvm.api.decoder.DecoderUtils.findStorageField;
+import static org.usvm.api.decoder.DecoderUtils.getAllMethods;
 
 @DecoderFor(LinkedHashMap.class)
 public class LinkedHashMap_Decoder implements ObjectDecoder {
@@ -54,26 +54,7 @@ public class LinkedHashMap_Decoder implements ObjectDecoder {
         return decoder.invokeMethod(m_ctor, args);
     }
 
-    private static List<JcField> getAllFields(JcClassOrInterface clazz) {
-        JcClassOrInterface superclass = clazz.getSuperClass();
-        if (superclass == null) {
-            return clazz.getDeclaredFields();
-        }
-        List<JcField> declaredFields = new ArrayList<>(clazz.getDeclaredFields());
-        declaredFields.addAll(getAllFields(superclass));
-        return declaredFields;
-    }
-
-    private static List<JcMethod> getAllMethods(JcClassOrInterface clazz) {
-        JcClassOrInterface superclass = clazz.getSuperClass();
-        if (superclass == null) {
-            return clazz.getDeclaredMethods();
-        }
-        List<JcMethod> declaredMethods = new ArrayList<>(clazz.getDeclaredMethods());
-        declaredMethods.addAll(getAllMethods(superclass));
-        return declaredMethods;
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public <T> void initializeInstance(final JcClassOrInterface approximation,
                                        final ObjectData<T> approximationData,
@@ -82,17 +63,7 @@ public class LinkedHashMap_Decoder implements ObjectDecoder {
         JcField f_hs_storage = cached_LinkedHashMap_storage;
         // TODO: add synchronization if needed
         if (f_hs_storage == null) {
-            final List<JcField> fields = getAllFields(approximation);
-            for (int i = 0, c = fields.size(); i != c; i++) {
-                JcField field = fields.get(i);
-                String fieldName = field.getName();
-
-                if (!"storage".equals(fieldName)) continue;
-
-                // early termination
-                cached_LinkedHashMap_storage = f_hs_storage = field;
-                break;
-            }
+            cached_LinkedHashMap_storage = f_hs_storage = findStorageField(approximation);
         }
 
         // skip empty or erroneous objects
@@ -166,13 +137,13 @@ public class LinkedHashMap_Decoder implements ObjectDecoder {
 
         while (length > 0) {
             T key = map.anyKey();
-            T value = map.get(key);
+            InternalMapEntry<T, T> entry = (InternalMapEntry<T, T>) map.get(key);
+            T value = entry.getValue();
 
             List<T> args = new ArrayList<>();
             args.add(outputInstance);
             args.add(key);
             args.add(value);
-            // TODO: call method #Approx
             decoder.invokeMethod(m_put, args);
 
             map.remove(key);

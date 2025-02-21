@@ -31,7 +31,7 @@ public class ListIteratorStubImpl<E> extends AbstractIteratorImpl<E> implements 
     }
 
     public ListIteratorStubImpl(AbstractListImpl<E> list, int index) {
-        this(list, index, list.modCount);
+        this(list, index, list._getModCount());
     }
 
     public ListIteratorStubImpl(AbstractListImpl<E> list) {
@@ -45,7 +45,7 @@ public class ListIteratorStubImpl<E> extends AbstractIteratorImpl<E> implements 
     }
 
     protected int _parentModCount() {
-        return _getList().modCount;
+        return _getList()._getModCount();
     }
 
     protected int _getSize(SymbolicList<E> storage) {
@@ -100,11 +100,11 @@ public class ListIteratorStubImpl<E> extends AbstractIteratorImpl<E> implements 
         _checkForModification();
         AbstractListImpl<E> list = _getList();
         SymbolicList<E> storage = list._getStorage();
-        list.modCount++;
+        list._incrementModCount();
         storage.remove(this.lastRet);
         this.cursor = this.lastRet;
         this.lastRet = -1;
-        this.expectedModCount = list.modCount;
+        this.expectedModCount = list._getModCount();
     }
 
     public void set(E e) {
@@ -120,12 +120,12 @@ public class ListIteratorStubImpl<E> extends AbstractIteratorImpl<E> implements 
         _checkForModification();
         AbstractListImpl<E> list = _getList();
         SymbolicList<E> storage = list._getStorage();
-        list.modCount++;
+        list._incrementModCount();
         // TODO: use ArrayList.add(e)
         storage.insert(this.cursor, e);
         this.cursor++;
         this.lastRet = -1;
-        this.expectedModCount = list.modCount;
+        this.expectedModCount = list._getModCount();
     }
 
     public void forEachRemaining(Consumer<? super E> userAction) {

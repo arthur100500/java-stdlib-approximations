@@ -65,6 +65,7 @@ public abstract class Map_ContentsSetImpl<K, V, Content> extends Map_ContentsImp
         return super.iterator();
     }
 
+    @NotNull
     public Stream<Content> parallelStream() {
         return super.parallelStream();
     }
@@ -73,7 +74,7 @@ public abstract class Map_ContentsSetImpl<K, V, Content> extends Map_ContentsImp
         return super.removeAll(c);
     }
 
-    public boolean removeIf(Predicate<? super Content> filter) {
+    public boolean removeIf(@NotNull Predicate<? super Content> filter) {
         return super.removeIf(filter);
     }
 
@@ -85,10 +86,12 @@ public abstract class Map_ContentsSetImpl<K, V, Content> extends Map_ContentsImp
         return super.size();
     }
 
+    @NotNull
     public Spliterator<Content> spliterator() {
         return new Map_ContentsSet_SpliteratorImpl<>(this);
     }
 
+    @NotNull
     public Stream<Content> stream() {
         return super.stream();
     }
@@ -98,7 +101,7 @@ public abstract class Map_ContentsSetImpl<K, V, Content> extends Map_ContentsImp
         return super.toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
         return super.toArray(generator);
     }
 

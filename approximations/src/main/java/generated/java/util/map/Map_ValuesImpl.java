@@ -39,7 +39,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
     }
 
     boolean _containsInStorage(LibSLRuntime.Map<K, Map.Entry<K, V>> storage, Object value) {
-        LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = getStorage().duplicate();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = _getStorage().duplicate();
         int size = unseen.size();
         Engine.assume(size > 0);
         for (int i = 0; i < size; i++) {
@@ -76,12 +76,13 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.iterator();
     }
 
+    @NotNull
     public Stream<V> parallelStream() {
         return super.parallelStream();
     }
 
     public boolean remove(Object value) {
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = storage.duplicate();
         int size = unseen.size();
         Engine.assume(size >= 0);
@@ -91,7 +92,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
             V curValue = entry.getValue();
             if (LibSLRuntime.equals(curValue, value)) {
                 storage.remove(key);
-                this.map.modCount++;
+                this.map._incrementModCount();
                 return true;
             }
 
@@ -105,7 +106,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.removeAll(c);
     }
 
-    public boolean removeIf(Predicate<? super V> filter) {
+    public boolean removeIf(@NotNull Predicate<? super V> filter) {
         return super.removeIf(filter);
     }
 
@@ -117,10 +118,12 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.size();
     }
 
+    @NotNull
     public Spliterator<V> spliterator() {
         return super.spliterator();
     }
 
+    @NotNull
     public Stream<V> stream() {
         return super.stream();
     }
@@ -130,7 +133,7 @@ public class Map_ValuesImpl<K, V> extends Map_ContentsImpl<K, V, V> {
         return super.toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
         return super.toArray(generator);
     }
 

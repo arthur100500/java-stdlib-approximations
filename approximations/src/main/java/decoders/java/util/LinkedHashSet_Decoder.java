@@ -11,8 +11,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static org.usvm.api.decoder.DecoderUtils.findStorageField;
+
 @DecoderFor(LinkedHashSet.class)
 public class LinkedHashSet_Decoder implements ObjectDecoder {
+    // TODO: unify with HashSet_Decoder
     private volatile JcMethod[] cachedMethods = null;
     private volatile JcMethod cached_LinkedHashSet_ctor = null;
     private volatile JcMethod cached_LinkedHashSet_add = null;
@@ -53,16 +56,6 @@ public class LinkedHashSet_Decoder implements ObjectDecoder {
         return decoder.invokeMethod(m_ctor, args);
     }
 
-    private static List<JcField> getAllFields(JcClassOrInterface clazz) {
-        JcClassOrInterface superclass = clazz.getSuperClass();
-        if (superclass == null) {
-            return clazz.getDeclaredFields();
-        }
-        List<JcField> declaredFields = new ArrayList<>(clazz.getDeclaredFields());
-        declaredFields.addAll(getAllFields(superclass));
-        return declaredFields;
-    }
-
     @Override
     public <T> void initializeInstance(final JcClassOrInterface approximation,
                                        final ObjectData<T> approximationData,
@@ -71,17 +64,7 @@ public class LinkedHashSet_Decoder implements ObjectDecoder {
         JcField f_hs_storage = cached_LinkedHashSet_storage;
         // TODO: add synchronization if needed
         if (f_hs_storage == null) {
-            final List<JcField> fields = getAllFields(approximation);
-            for (int i = 0, c = fields.size(); i != c; i++) {
-                JcField field = fields.get(i);
-                String fieldName = field.getName();
-
-                if (!"storage".equals(fieldName)) continue;
-
-                // early termination
-                cached_LinkedHashSet_storage = f_hs_storage = field;
-                break;
-            }
+            cached_LinkedHashSet_storage = f_hs_storage = findStorageField(approximation);
         }
 
         // skip empty or erroneous objects

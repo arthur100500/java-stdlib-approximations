@@ -77,8 +77,9 @@ public class LinkedHashMapImpl<K, V> extends HashMapImpl<K, V> {
         return super.entrySet();
     }
 
+    @SuppressWarnings("EqualsDoesntCheckParameterClass")
     public boolean equals(Object other) {
-        return Engine.typeIs(other, LinkedHashMapImpl.class) && super.equals(other);
+        return Engine.typeIs(other, LinkedHashMapImpl.class) && super._equals(other);
     }
 
     public void forEach(BiConsumer<? super K, ? super V> userAction) {

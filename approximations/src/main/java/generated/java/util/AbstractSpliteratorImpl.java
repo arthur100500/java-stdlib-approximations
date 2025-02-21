@@ -10,66 +10,72 @@ import java.util.function.Consumer;
 @Approximate(java.util.Spliterators.AbstractSpliterator.class)
 public abstract class AbstractSpliteratorImpl<E> implements Spliterator<E> {
 
-    public int index;
-
-    public int fence;
-
-    public int expectedModCount;
-
     public AbstractSpliteratorImpl(int index, int fence, int expectedModCount) {
         Engine.assume(index >= 0);
-        this.index = index;
-        this.fence = fence;
-        this.expectedModCount = expectedModCount;
+        _setIndex(index);
+        _setFence(fence);
+        _setExpectedModCount(expectedModCount);
     }
+
+    abstract protected int _getIndex();
+
+    abstract protected void _setIndex(int newIndex);
+
+    abstract protected int _getFence();
+
+    abstract protected void _setFence(int newFence);
+
+    abstract protected int _getExpectedModCount();
+
+    abstract protected void _setExpectedModCount(int newExpectedModCount);
 
     abstract protected AbstractSpliteratorImpl<E> _create(int index, int fence);
 
     abstract protected int _parentModCount();
 
     protected final void _eval() {
-        this.expectedModCount = _parentModCount();
+        _setExpectedModCount(_parentModCount());
     }
 
     abstract protected int _storageSize();
 
-    protected int _getFence() {
-        if (this.fence < 0) {
+    protected int _fence() {
+        if (this._getFence() < 0) {
             _eval();
-            this.fence = _storageSize();
-            Engine.assume(this.fence >= 0);
+            _setFence(_storageSize());
+            Engine.assume(this._getFence() >= 0);
         }
 
-        return this.fence;
+        return this._getFence();
     }
 
     protected void _checkForModification() {
-        if (_parentModCount() != expectedModCount)
+        if (_parentModCount() != _getExpectedModCount())
             throw new ConcurrentModificationException();
     }
 
-    public abstract int characteristics();
+    protected abstract int _characteristics();
 
-    public long estimateSize() {
-        return getExactSizeIfKnown();
+    public long _estimateSize() {
+        return _getExactSizeIfKnown();
     }
 
-    public abstract void forEachRemaining(Consumer<? super E> userAction);
+    protected abstract void _forEachRemaining(Consumer<? super E> userAction);
 
-    public long getExactSizeIfKnown() {
-        return _getFence() - this.index;
+    public long _getExactSizeIfKnown() {
+        return _fence() - _getIndex();
     }
 
-    public abstract boolean tryAdvance(Consumer<? super E> userAction);
+    protected abstract boolean _tryAdvance(Consumer<? super E> userAction);
 
-    public AbstractSpliteratorImpl<E> trySplit() {
-        int hi = _getFence();
-        int lo = this.index;
+    protected AbstractSpliteratorImpl<E> _trySplit() {
+        int hi = _fence();
+        int lo = _getIndex();
         int mid = (lo + hi) >>> 1;
         if (lo >= mid)
             return null;
 
-        this.index = mid;
+        _setIndex(mid);
         return _create(lo, mid);
     }
 }

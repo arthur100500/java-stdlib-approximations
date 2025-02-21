@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.usvm.api.decoder.DecoderUtils.findStorageField;
+
 @SuppressWarnings("ForLoopReplaceableByForEach")
 @DecoderFor(ArrayList.class)
 public class ArrayList_Decoder implements ObjectDecoder {
@@ -59,16 +61,6 @@ public class ArrayList_Decoder implements ObjectDecoder {
         return decoder.invokeMethod(m_ctor, (List<T>) Collections.EMPTY_LIST);
     }
 
-    private static List<JcField> getAllFields(JcClassOrInterface clazz) {
-        JcClassOrInterface superclass = clazz.getSuperClass();
-        if (superclass == null) {
-            return clazz.getDeclaredFields();
-        }
-        List<JcField> declaredFields = new ArrayList<>(clazz.getDeclaredFields());
-        declaredFields.addAll(getAllFields(superclass));
-        return declaredFields;
-    }
-
     @Override
     public <T> void initializeInstance(final JcClassOrInterface approx,
                                        final ObjectData<T> approxData,
@@ -77,14 +69,7 @@ public class ArrayList_Decoder implements ObjectDecoder {
         JcField f_storage = cached_ArrayList_storage;
         // TODO: add synchronization if needed
         if (f_storage == null) {
-            final List<JcField> fields = getAllFields(approx);
-            for (int i = 0, c = fields.size(); i < c; i++) {
-                JcField f = fields.get(i);
-                if ("storage".equals(f.getName())) {
-                    cached_ArrayList_storage = f_storage = f;
-                    break;
-                }
-            }
+            cached_ArrayList_storage = f_storage = findStorageField(approx);
         }
 
         if (approxData.getObjectField(f_storage) == null)

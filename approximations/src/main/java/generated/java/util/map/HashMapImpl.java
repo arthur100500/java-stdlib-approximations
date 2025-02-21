@@ -14,12 +14,17 @@ import java.util.function.Function;
 import org.jacodb.approximation.annotation.Approximate;
 import org.jetbrains.annotations.NotNull;
 import org.usvm.api.Engine;
+import runtime.LibSLRuntime;
 
 @Approximate(java.util.HashMap.class)
 public class HashMapImpl<K, V> extends AbstractMapImpl<K, V> implements Cloneable, Serializable {
 
     @Serial
     private static final long serialVersionUID = 362498820763181265L;
+
+    private LibSLRuntime.Map<K, Map.Entry<K, V>> storage;
+
+    private int modCount;
 
     static {
         Engine.assume(true);
@@ -44,114 +49,138 @@ public class HashMapImpl<K, V> extends AbstractMapImpl<K, V> implements Cloneabl
         super(true, initialCapacity, loadFactor);
     }
 
-    public void clear() {
-        super.clear();
+    public LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage() {
+        LibSLRuntime.Map<K, Map.Entry<K, V>> result = this.storage;
+        Engine.assume(result != null);
+        return result;
     }
 
+    public void _setStorage(LibSLRuntime.Map<K, Entry<K, V>> storage) {
+        this.storage = storage;
+    }
+
+    protected int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
+    }
+
+    protected boolean _isHashMap() {
+        return true;
+    }
+
+    public void clear() {
+        super._clear();
+    }
+
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+        return super._clone();
     }
 
     public V compute(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-        return super.compute(key, remappingFunction);
+        return super._compute(key, remappingFunction);
     }
 
     public V computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
-        return super.computeIfAbsent(key, mappingFunction);
+        return super._computeIfAbsent(key, mappingFunction);
     }
 
     public V computeIfPresent(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-        return super.computeIfPresent(key, remappingFunction);
+        return super._computeIfPresent(key, remappingFunction);
     }
 
     public boolean containsKey(Object key) {
-        return super.containsKey(key);
+        return super._containsKey(key);
     }
 
     public boolean containsValue(Object value) {
-        return super.containsValue(value);
+        return super._containsValue(value);
     }
 
     @NotNull
     public Set<Map.Entry<K, V>> entrySet() {
-        return super.entrySet();
+        return super._entrySet();
     }
 
+    @SuppressWarnings("EqualsDoesntCheckParameterClass")
     public boolean equals(Object other) {
-        return Engine.typeIs(other, HashMapImpl.class) && super.equals(other);
+        return Engine.typeIs(other, HashMapImpl.class) && super._equals(other);
     }
 
     public void forEach(BiConsumer<? super K, ? super V> userAction) {
-        super.forEach(userAction);
+        super._forEach(userAction);
     }
 
     public V get(Object key) {
-        return super.get(key);
+        return super._get(key);
     }
 
     public V getOrDefault(Object key, V defaultValue) {
-        return super.getOrDefault(key, defaultValue);
+        return super._getOrDefault(key, defaultValue);
     }
 
     public int hashCode() {
-        return super.hashCode();
+        return super._hashCode();
     }
 
     public boolean isEmpty() {
-        return super.isEmpty();
+        return super._isEmpty();
     }
 
     @NotNull
     public Set<K> keySet() {
-        return super.keySet();
+        return super._keySet();
     }
 
     public V merge(K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-        return super.merge(key, value, remappingFunction);
+        return super._merge(key, value, remappingFunction);
     }
 
     public V put(K key, V value) {
-        return super.put(key, value);
+        return super._put(key, value);
     }
 
     public void putAll(@NotNull Map<? extends K, ? extends V> m) {
-        super.putAll(m);
+        super._putAll(m);
     }
 
     public V putIfAbsent(K key, V value) {
-        return super.putIfAbsent(key, value);
+        return super._putIfAbsent(key, value);
     }
 
     public V remove(Object key) {
-        return super.remove(key);
+        return super._remove(key);
     }
 
     public boolean remove(Object key, Object value) {
-        return super.remove(key, value);
+        return super._remove(key, value);
     }
 
     public V replace(K key, V value) {
-        return super.replace(key, value);
+        return super._replace(key, value);
     }
 
     public boolean replace(K key, V oldValue, V newValue) {
-        return super.replace(key, oldValue, newValue);
+        return super._replace(key, oldValue, newValue);
     }
 
     public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
-        super.replaceAll(function);
+        super._replaceAll(function);
     }
 
     public int size() {
-        return super.size();
+        return super._size();
     }
 
     public String toString() {
-        return super.toString();
+        return super._toString();
     }
 
     @NotNull
     public Collection<V> values() {
-        return super.values();
+        return super._values();
     }
 }

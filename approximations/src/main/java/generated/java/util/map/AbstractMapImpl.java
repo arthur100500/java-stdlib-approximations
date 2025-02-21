@@ -13,31 +13,20 @@ import java.util.function.Function;
 @Approximate(java.util.AbstractMap.class)
 public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
 
-    public LibSLRuntime.Map<K, Map.Entry<K, V>> storage;
-
-    public transient int modCount;
-
-    final boolean isHashMap;
-
-    static <K, V> LibSLRuntime.Map.Container<K, Map.Entry<K, V>> createContainer(boolean isHashMap) {
+    static <K, V> LibSLRuntime.Map.Container<K, Map.Entry<K, V>> _createContainer(boolean isHashMap) {
         if (isHashMap)
             return new LibSLRuntime.HashMapContainer<>();
 
         return new LibSLRuntime.IdentityMapContainer<>();
     }
 
-    static <K, V> LibSLRuntime.Map<K, Map.Entry<K, V>> createStorage(boolean isHashMap) {
-        return new LibSLRuntime.Map<>(createContainer(isHashMap));
+    static <K, V> LibSLRuntime.Map<K, Map.Entry<K, V>> _createStorage(boolean isHashMap) {
+        return new LibSLRuntime.Map<>(_createContainer(isHashMap));
     }
 
     public AbstractMapImpl(boolean isHashMap) {
-        this.storage = createStorage(isHashMap);
-        this.modCount = 0;
-        this.isHashMap = isHashMap;
-    }
-
-    public AbstractMapImpl() {
-        this(true);
+        _setStorage(_createStorage(isHashMap));
+        _setModCount(0);
     }
 
     public AbstractMapImpl(boolean isHashMap, Map<? extends K, ? extends V> m) {
@@ -49,11 +38,11 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         if (initialCapacity < 0)
             throw new IllegalArgumentException();
 
-        this.storage = createStorage(isHashMap);
-        this.modCount = 0;
-        this.isHashMap = isHashMap;
+        _setStorage(_createStorage(isHashMap));
+        _setModCount(0);
     }
 
+    @SuppressWarnings("ExpressionComparedToItself")
     public AbstractMapImpl(boolean isHashMap, int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
             throw new IllegalArgumentException();
@@ -61,15 +50,22 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         if (loadFactor <= 0 || loadFactor != loadFactor)
             throw new IllegalArgumentException();
 
-        this.storage = createStorage(isHashMap);
-        this.modCount = 0;
-        this.isHashMap = isHashMap;
+        _setStorage(_createStorage(isHashMap));
+        _setModCount(0);
     }
 
-    public LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage() {
-        LibSLRuntime.Map<K, Map.Entry<K, V>> result = this.storage;
-        Engine.assume(result != null);
-        return result;
+    public abstract LibSLRuntime.Map<K, Map.Entry<K, V>> _getStorage();
+
+    public abstract void _setStorage(LibSLRuntime.Map<K, Map.Entry<K, V>> storage);
+
+    abstract protected int _getModCount();
+
+    abstract protected void _setModCount(int newModCount);
+
+    abstract protected boolean _isHashMap();
+
+    protected void _incrementModCount() {
+        _setModCount(_getModCount() + 1);
     }
 
     @SuppressWarnings("unchecked")
@@ -93,25 +89,25 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
                 Entry<K, V> entry = new AbstractMap_EntryImpl<>(key, value);
                 storage.set(key, entry);
             }
-            this.modCount++;
+            _incrementModCount();
         }
     }
 
     public void _checkForModification(int expectedModCount) {
-        if (this.modCount != expectedModCount)
+        if (_getModCount() != expectedModCount)
             throw new ConcurrentModificationException();
     }
 
-    public void clear() {
-        this.modCount++;
-        this.storage = createStorage(this.isHashMap);
+    public void _clear() {
+        _incrementModCount();
+        _setStorage(_createStorage(_isHashMap()));
     }
 
     @SuppressWarnings("unchecked")
-    public Object clone() throws CloneNotSupportedException {
+    public Object _clone() throws CloneNotSupportedException {
         AbstractMapImpl<K, V> clonedMap = (AbstractMapImpl<K, V>) super.clone();
-        clonedMap.storage = _getStorage().duplicate();
-        clonedMap.modCount = 0;
+        clonedMap._setStorage(_getStorage().duplicate());
+        clonedMap._setModCount(0);
         return clonedMap;
     }
 
@@ -149,14 +145,14 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @SuppressWarnings("ConstantValue")
-    public V compute(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+    public V _compute(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         if (remappingFunction == null)
             throw new NullPointerException();
 
         Map.Entry<K, V> entry = _getEntry(key);
         V oldValue = _getEntryValueIfNotNull(entry);
 
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         V newValue = remappingFunction.apply(key, oldValue);
         _checkForModification(expectedModCount);
         _update(key, entry, newValue);
@@ -165,7 +161,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @SuppressWarnings("ConstantValue")
-    public V computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
+    public V _computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
         if (mappingFunction == null)
             throw new NullPointerException();
 
@@ -175,7 +171,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         if (oldValue != null)
             return oldValue;
 
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         V newValue = mappingFunction.apply(key);
         _checkForModification(expectedModCount);
         _update(key, entry, newValue);
@@ -184,7 +180,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @SuppressWarnings("ConstantValue")
-    public V computeIfPresent(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+    public V _computeIfPresent(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         if (remappingFunction == null)
             throw new NullPointerException();
 
@@ -194,7 +190,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         if (oldValue == null)
             return oldValue;
 
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         V newValue = remappingFunction.apply(key, oldValue);
         _checkForModification(expectedModCount);
         _update(key, entry, newValue);
@@ -203,12 +199,12 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean containsKey(Object key) {
+    public boolean _containsKey(Object key) {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         return storage.size() != 0 && storage.hasKey((K) key);
     }
 
-    public boolean containsValue(Object value) {
+    public boolean _containsValue(Object value) {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int storageSize = storage.size();
         if (storageSize == 0)
@@ -230,12 +226,12 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @NotNull
-    public Set<Map.Entry<K, V>> entrySet() {
+    public Set<Map.Entry<K, V>> _entrySet() {
         return new Map_EntrySetImpl<>(this);
     }
 
     @SuppressWarnings({"unchecked", "ConstantValue"})
-    public boolean equals(Object other) {
+    public boolean _equals(Object other) {
         if (other == this)
             return true;
 
@@ -272,7 +268,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         return true;
     }
 
-    public void forEach(BiConsumer<? super K, ? super V> userAction) {
+    public void _forEach(BiConsumer<? super K, ? super V> userAction) {
         if (userAction == null)
             throw new NullPointerException();
 
@@ -282,7 +278,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
             return;
 
         Engine.assume(storageSize > 0);
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = storage.duplicate();
         for (int i = 0; i < storageSize; i++) {
             K curKey = unseen.anyKey();
@@ -295,30 +291,30 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    public V get(Object key) {
+    public V _get(Object key) {
         return _getEntryValueIfNotNull(_getEntry((K) key));
     }
 
     @SuppressWarnings("unchecked")
-    public V getOrDefault(Object key, V defaultValue) {
+    public V _getOrDefault(Object key, V defaultValue) {
         return _getEntryValueIfNotNull(_getEntry((K) key), defaultValue);
     }
 
-    public int hashCode() {
+    public int _hashCode() {
         return LibSLRuntime.hashCode(_getStorage());
     }
 
-    public boolean isEmpty() {
+    public boolean _isEmpty() {
         return _getStorage().size() == 0;
     }
 
     @NotNull
-    public Set<K> keySet() {
+    public Set<K> _keySet() {
         return new Map_KeySetImpl<>(this);
     }
 
     @SuppressWarnings("ConstantValue")
-    public V merge(K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+    public V _merge(K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
         if (value == null)
             throw new NullPointerException();
 
@@ -333,7 +329,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
             if (oldValue == null) {
                 result = value;
             } else {
-                int expectedModCount = this.modCount;
+                int expectedModCount = _getModCount();
                 result = remappingFunction.apply(oldValue, value);
                 _checkForModification(expectedModCount);
             }
@@ -347,11 +343,11 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
 
         Map.Entry<K, V> entry = new AbstractMap_EntryImpl<>(key, value);
         storage.set(key, entry);
-        this.modCount++;
+        _incrementModCount();
         return value;
     }
 
-    public V put(K key, V value) {
+    public V _put(K key, V value) {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(key)) {
             Map.Entry<K, V> entry = storage.get(key);
@@ -362,20 +358,20 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
 
         Map.Entry<K, V> entry = new AbstractMap_EntryImpl<>(key, value);
         storage.set(key, entry);
-        this.modCount++;
+        _incrementModCount();
 
         return null;
     }
 
     @SuppressWarnings("ConstantValue")
-    public void putAll(@NotNull Map<? extends K, ? extends V> m) {
+    public void _putAll(@NotNull Map<? extends K, ? extends V> m) {
         if (m == null)
             throw new NullPointerException();
 
         _addAllElements(m);
     }
 
-    public V putIfAbsent(K key, V value) {
+    public V _putIfAbsent(K key, V value) {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(key)) {
             Map.Entry<K, V> entry = storage.get(key);
@@ -384,20 +380,20 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
 
         Map.Entry<K, V> entry = new AbstractMap_EntryImpl<>(key, value);
         storage.set(key, entry);
-        this.modCount++;
+        _incrementModCount();
 
         return null;
     }
 
     @SuppressWarnings("unchecked")
-    public V remove(Object key) {
+    public V _remove(Object key) {
         K typedKey = (K) key;
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(typedKey)) {
             Map.Entry<K, V> entry = storage.get(typedKey);
             V result = entry.getValue();
             storage.remove(typedKey);
-            this.modCount++;
+            _incrementModCount();
             return result;
         }
 
@@ -405,7 +401,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean remove(Object key, Object value) {
+    public boolean _remove(Object key, Object value) {
         K typedKey = (K) key;
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(typedKey)) {
@@ -413,7 +409,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
             V curValue = entry.getValue();
             if (LibSLRuntime.equals(curValue, value)) {
                 storage.remove(typedKey);
-                this.modCount++;
+                _incrementModCount();
                 return true;
             }
         }
@@ -421,7 +417,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         return false;
     }
 
-    public V replace(K key, V value) {
+    public V _replace(K key, V value) {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(key)) {
             Map.Entry<K, V> entry = storage.get(key);
@@ -433,7 +429,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         return null;
     }
 
-    public boolean replace(K key, V oldValue, V newValue) {
+    public boolean _replace(K key, V oldValue, V newValue) {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(key)) {
             Map.Entry<K, V> entry = storage.get(key);
@@ -447,7 +443,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         return false;
     }
 
-    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+    public void _replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
         if (function == null)
             throw new NullPointerException();
 
@@ -457,7 +453,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
             return;
 
         Engine.assume(size > 0);
-        int expectedModCount = this.modCount;
+        int expectedModCount = _getModCount();
         LibSLRuntime.Map<K, Map.Entry<K, V>> unseen = storage.duplicate();
         for (int i = 0; i < size; i++) {
             K key = unseen.anyKey();
@@ -468,11 +464,11 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
         _checkForModification(expectedModCount);
     }
 
-    public int size() {
+    public int _size() {
         return _getStorage().size();
     }
 
-    public String toString() {
+    public String _toString() {
         LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         int size = storage.size();
         if (size == 0)
@@ -496,7 +492,7 @@ public abstract class AbstractMapImpl<K, V> implements Map<K, V> {
     }
 
     @NotNull
-    public Collection<V> values() {
+    public Collection<V> _values() {
         return new Map_ValuesImpl<>(this);
     }
 

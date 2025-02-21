@@ -78,6 +78,7 @@ public final class Map_EntrySetImpl<K, V> extends Map_ContentsSetImpl<K, V, Map.
         return super.iterator();
     }
 
+    @NotNull
     public Stream<Map.Entry<K, V>> parallelStream() {
         return super.parallelStream();
     }
@@ -89,12 +90,12 @@ public final class Map_EntrySetImpl<K, V> extends Map_ContentsSetImpl<K, V, Map.
 
         Map.Entry<K, V> typedOtherEntry = (Map.Entry<K, V>) o;
         K key = typedOtherEntry.getKey();
-        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = getStorage();
+        LibSLRuntime.Map<K, Map.Entry<K, V>> storage = _getStorage();
         if (storage.hasKey(key)) {
             Map.Entry<K, V> entry = storage.get(key);
             if (LibSLRuntime.equals(entry, typedOtherEntry)) {
                 storage.remove(key);
-                this.map.modCount++;
+                this.map._incrementModCount();
                 return true;
             }
         }
@@ -106,7 +107,7 @@ public final class Map_EntrySetImpl<K, V> extends Map_ContentsSetImpl<K, V, Map.
         return super.removeAll(c);
     }
 
-    public boolean removeIf(Predicate<? super Map.Entry<K, V>> filter) {
+    public boolean removeIf(@NotNull Predicate<? super Map.Entry<K, V>> filter) {
         return super.removeIf(filter);
     }
 
@@ -118,10 +119,12 @@ public final class Map_EntrySetImpl<K, V> extends Map_ContentsSetImpl<K, V, Map.
         return super.size();
     }
 
+    @NotNull
     public Spliterator<Map.Entry<K, V>> spliterator() {
         return super.spliterator();
     }
 
+    @NotNull
     public Stream<Map.Entry<K, V>> stream() {
         return super.stream();
     }
@@ -131,7 +134,7 @@ public final class Map_EntrySetImpl<K, V> extends Map_ContentsSetImpl<K, V, Map.
         return super.toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
         return super.toArray(generator);
     }
 

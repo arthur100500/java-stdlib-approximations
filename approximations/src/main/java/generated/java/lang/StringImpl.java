@@ -21,8 +21,12 @@ public class StringImpl implements Serializable {
 
     static final byte LATIN1 = 0;
 
-    // Enforce coder == UTF8
-    static final boolean COMPACT_STRINGS = true;
+    static final boolean COMPACT_STRINGS;
+
+    static {
+        // Enforce coder == UTF8
+        COMPACT_STRINGS = true;
+    }
 
     private final byte[] value;
 

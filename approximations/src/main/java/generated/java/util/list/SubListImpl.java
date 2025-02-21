@@ -37,6 +37,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
 
     @SuppressWarnings("DataFlowIssue")
     private SubListImpl(AbstractListImpl<E> list, SubListImpl<E> parent, int offset, int length, int modCount) {
+        super(null, 0);
         Engine.assume(list != null);
         Engine.assume(offset >= 0);
         Engine.assume(length >= 0);
@@ -50,6 +51,21 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
 
     public SubListImpl(AbstractListImpl<E> list, int fromIndex, int toIndex) {
         this(list, null, fromIndex, toIndex - fromIndex, 0);
+    }
+
+    public SymbolicList<E> _getStorage() {
+        return null;
+    }
+
+    public void _setStorage(SymbolicList<E> storage) {
+    }
+
+    public int _getModCount() {
+        return modCount;
+    }
+
+    protected void _setModCount(int newModCount) {
+        this.modCount = newModCount;
     }
 
     public AbstractListImpl<E> _getList() {
@@ -83,7 +99,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
     public void _updateSizeAndModCount(int sizeChange) {
         this.length += sizeChange;
         AbstractListImpl<E> list = _getList();
-        this.modCount = list.modCount;
+        this.modCount = list._getModCount();
         SubListImpl<E> parentSubList = this.parentSubList;
         while (parentSubList != null) {
             parentSubList.length += sizeChange;
@@ -176,14 +192,14 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         for (int i = start; i > end; i--) {
             rootStorage.remove(i);
         }
-        list.modCount++;
+        list._incrementModCount();
         _updateSizeAndModCount(-size);
     }
 
     @SuppressWarnings("unchecked")
     public Object clone() throws CloneNotSupportedException {
         SubListImpl<E> cloned = (SubListImpl<E>) super.clone();
-        cloned.list = (AbstractListImpl<E>) this.list.clone();
+        cloned.list = (AbstractListImpl<E>) this.list._clone();
         cloned.parentSubList = (SubListImpl<E>) this.parentSubList.clone();
         cloned.modCount = 0;
         return cloned;
@@ -255,7 +271,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         Engine.assume(this.length > 0);
         AbstractListImpl<E> list = _getList();
         SymbolicList<E> rootStorage = list._getStorage();
-        int expectedModCount = list.modCount;
+        int expectedModCount = list._getModCount();
         this.modCount = expectedModCount;
         int end = _endIndex();
         list._checkForModification(expectedModCount);
@@ -327,6 +343,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return new SubListIteratorStubImpl<>(this, index);
     }
 
+    @NotNull
     public Stream<E> parallelStream() {
         return _makeStream(true);
     }
@@ -359,7 +376,7 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return _batchRemove(c, false);
     }
 
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@NotNull Predicate<? super E> filter) {
         AbstractListImpl<E> list = _getList();
         list._checkForModification(this.modCount);
         if (isEmpty())
@@ -376,7 +393,8 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
         return false;
     }
 
-    public void replaceAll(UnaryOperator<E> operator) {
+    @SuppressWarnings("ConstantValue")
+    public void replaceAll(@NotNull UnaryOperator<E> operator) {
         if (operator == null)
             throw new NullPointerException();
 
@@ -407,13 +425,15 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
     public void sort(Comparator<? super E> c) {
         AbstractListImpl<E> list = _getList();
         list._do_sort(this.offset, _endIndex(), c);
-        this.modCount = list.modCount;
+        this.modCount = list._getModCount();
     }
 
+    @NotNull
     public Spliterator<E> spliterator() {
         return new SubListSpliteratorStubImpl<>(this);
     }
 
+    @NotNull
     public Stream<E> stream() {
         return _makeStream(false);
     }
@@ -428,16 +448,16 @@ public final class SubListImpl<E> extends AbstractListImpl<E> implements RandomA
 
     @NotNull
     public Object[] toArray() {
-        return super.toArray();
+        return super._toArray();
     }
 
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
+    public <T> T[] toArray(@NotNull IntFunction<T[]> generator) {
+        return super._toArray(generator);
     }
 
     @NotNull
     public <T> T[] toArray(@NotNull T[] array) {
-        return super.toArray(array);
+        return super._toArray(array);
     }
 
     public String toString() {

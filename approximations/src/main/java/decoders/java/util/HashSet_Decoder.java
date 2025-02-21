@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.usvm.api.decoder.DecoderUtils.findStorageField;
+
 @DecoderFor(HashSet.class)
 public final class HashSet_Decoder implements ObjectDecoder {
     private volatile JcMethod[] cachedMethods = null;
@@ -65,17 +67,7 @@ public final class HashSet_Decoder implements ObjectDecoder {
         JcField f_hs_storage = cached_HashSet_storage;
         // TODO: add synchronization if needed
         if (f_hs_storage == null) {
-            final List<JcField> fields = approximation.getDeclaredFields();
-            for (int i = 0, c = fields.size(); i != c; i++) {
-                JcField field = fields.get(i);
-                String fieldName = field.getName();
-
-                if (!"storage".equals(fieldName)) continue;
-
-                // early termination
-                cached_HashSet_storage = f_hs_storage = field;
-                break;
-            }
+            cached_HashSet_storage = f_hs_storage = findStorageField(approximation);
         }
 
         // skip erroneous objects

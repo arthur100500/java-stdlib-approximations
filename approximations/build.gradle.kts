@@ -2,6 +2,7 @@ plugins {
     java
     `maven-publish`
     id("org.springframework.boot") version "3.2.0" apply false
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 repositories {
@@ -18,8 +19,11 @@ dependencies {
     compileOnly(files(rootDir.resolve("usvm-api/usvm-jvm-api.jar")))
     compileOnly(files(rootDir.resolve("usvm-api/usvm-jvm-concrete-api.jar")))
 
+    compileOnly(files(rootDir.resolve("usvm-api/usvm-api.jar")))
+    compileOnly("org.springframework.boot:spring-boot-starter-security:3.3.4")
     compileOnly("org.springframework.boot:spring-boot-starter-web:3.3.4")
     compileOnly("org.springframework.boot:spring-boot-starter-test:3.3.4")
+    compileOnly("org.springframework.security:spring-security-test:6.2.0")
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa:3.3.4")
 
     // Fixes "unknown enum constant 'When.MAYBE'" warning

@@ -57,8 +57,10 @@ public class SpringApplicationImpl {
 
     private static void _fillSecurityHeaders() {
         // Define headers here
-        RequestMap headers = new RequestMap("HEADERS");
+        RequestMap headers = new RequestMap("HEADER");
         headers.set("AUTHORIZATION", null);
+        headers.set("ORIGIN", null);
+        headers.set("HOST", null);
     }
 
     private static UserDetails _createSymbolicUser() {

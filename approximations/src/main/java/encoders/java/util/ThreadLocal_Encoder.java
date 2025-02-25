@@ -9,6 +9,6 @@ public class ThreadLocal_Encoder implements ObjectEncoder {
 
     @Override
     public Object encode(Object object) {
-        return new ThreadLocalImpl<>();
+        return new ThreadLocalImpl<>(object);
     }
 }

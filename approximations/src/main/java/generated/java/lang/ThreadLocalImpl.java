@@ -6,7 +6,11 @@ import java.util.function.Supplier;
 
 @Approximate(java.lang.ThreadLocal.class)
 public class ThreadLocalImpl<T> {
-    private T storage = null;
+    private T storage;
+
+    public ThreadLocalImpl(T value) {
+        storage = value;
+    }
 
     public static <S> ThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
         ThreadLocal<S> local = new ThreadLocal<>();

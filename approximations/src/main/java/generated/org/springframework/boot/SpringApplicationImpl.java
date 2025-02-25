@@ -1,13 +1,11 @@
 package generated.org.springframework.boot;
 
-import jakarta.servlet.Filter;
 import org.jacodb.approximation.annotation.Approximate;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Service;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -55,11 +53,13 @@ public class SpringApplicationImpl {
         DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
 //        builder.addFilters(filters);
         MockMvc mockMvc = builder.build();
+        ArrayList<Object> needToInitSymbolic = new ArrayList<>();
         // Making fields with `@Value` annotation symbolic
         for (Class<?> type : _classesWithFieldsValueAnnotation()) {
-            for (Object obj : context.getBeansOfType(type).values()) {
-                _initValueFieldsSymbolic(obj);
-            }
+            needToInitSymbolic.addAll(context.getBeansOfType(type).values());
+        }
+        for (Object bean : needToInitSymbolic) {
+            _initValueFieldsSymbolic(bean);
         }
         Map<String, Map<String, List<Object>>> allPaths = _allControllerPaths();
         for (String controllerName : allPaths.keySet()) {

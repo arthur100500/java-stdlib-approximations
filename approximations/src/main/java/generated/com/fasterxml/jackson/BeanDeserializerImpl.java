@@ -10,12 +10,15 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerBase;
 import com.fasterxml.jackson.databind.deser.SettableBeanProperty;
 import generated.org.springframework.boot.SpringApplicationImpl;
 import generated.org.springframework.boot.SymbolicValueFactory;
+import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import org.jacodb.approximation.annotation.Approximate;
 import stub.java.util.map.RequestMap;
 
 import java.io.IOException;
 import java.io.Serial;
 import java.util.*;
+
+import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.writePinnedValue;
 
 @Approximate(BeanDeserializer.class)
 public class BeanDeserializerImpl extends BeanDeserializer {
@@ -42,7 +45,7 @@ public class BeanDeserializerImpl extends BeanDeserializer {
     }
 
     private void _writeToState(Object root) {
-        new RequestMap("BODY").set("", root);
+        writePinnedValue(PinnedValueSource.REQUEST_BODY, root);
     }
 
     public static boolean _concreteDeserialization() {

@@ -1,5 +1,6 @@
 package stub.java.util.map;
 
+import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,10 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class RequestMultiValueMap implements Map<String, String[]> {
-    /* Used to define kind of stored values (HEADER, PARAM, MATRIX, PATH, COOKIE)*/
-    public String sourcePrefix;
+    public PinnedValueSource sourcePrefix;
     
-    public RequestMultiValueMap(String sourcePrefix) {
+    public RequestMultiValueMap(PinnedValueSource sourcePrefix) {
         this.sourcePrefix = sourcePrefix;
     }
 

@@ -1,6 +1,7 @@
 package stub.java.util.map;
 
 
+import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,10 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class RequestMap implements Map<String, String> {
-    /* Used to define kind of stored values (HEADER, PARAM, MATRIX, PATH, COOKIE)*/
-    public String sourcePrefix;
+    public PinnedValueSource sourcePrefix;
 
-    public RequestMap(String sourcePrefix) {
+    public RequestMap(PinnedValueSource sourcePrefix) {
         this.sourcePrefix = sourcePrefix;
     }
 

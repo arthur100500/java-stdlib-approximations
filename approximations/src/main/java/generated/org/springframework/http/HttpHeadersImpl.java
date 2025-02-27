@@ -1,5 +1,6 @@
 package generated.org.springframework.http;
 
+import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import org.jacodb.approximation.annotation.Approximate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -8,7 +9,7 @@ import stub.java.util.map.RequestMap;
 
 @Approximate(HttpHeaders.class)
 public class HttpHeadersImpl {
-    private final RequestMap fakeHeaders = new RequestMap("HEADER");
+    private final RequestMap fakeHeaders = new RequestMap(PinnedValueSource.REQUEST_HEADER);
     
     public void set(String headerName, @Nullable String headerValue) {
         fakeHeaders.set(headerName, headerValue);

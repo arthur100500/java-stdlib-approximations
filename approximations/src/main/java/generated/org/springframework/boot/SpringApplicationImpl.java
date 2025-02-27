@@ -1,5 +1,7 @@
 package generated.org.springframework.boot;
 
+import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
+import jakarta.servlet.Filter;
 import org.jacodb.approximation.annotation.Approximate;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationContextFactory;
@@ -17,6 +19,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.usvm.api.Engine;
 import stub.java.util.map.RequestMap;
+
+import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.getPinnedValue;
+import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.writePinnedValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import java.util.*;
@@ -50,19 +55,13 @@ public class SpringApplicationImpl {
         return new ArrayList<>();
     }
 
-    private static void _writeToState(String prefix, Object v) {
-        new RequestMap(prefix).set("", v);
-    }
-
     private static void _fillSecurityHeaders() {
-        // Define headers here
-        RequestMap headers = new RequestMap("HEADERS");
-        headers.set("AUTHORIZATION", null);
+        writePinnedValue(PinnedValueSource.REQUEST_HEADER, "AUTHORIZATION", null);
     }
 
     private static UserDetails _createSymbolicUser() {
-        String username = new RequestMap("USER").get("USERNAME");
-        String password = new RequestMap("USER").get("PASSWORD");
+        String username = getPinnedValue(PinnedValueSource.REQUEST_USER_NAME, String.class);
+        String password = getPinnedValue(PinnedValueSource.REQUEST_USER_PASSWORD, String.class);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         Engine.assume(username != null && !username.isEmpty());
         Engine.assume(password != null && !password.isEmpty());
@@ -98,7 +97,7 @@ public class SpringApplicationImpl {
                         _fillSecurityHeaders();
                         try {
                             HttpMethod method = HttpMethod.valueOf(kind);
-                            mockMvc.perform(request(method, path, pathArgs).with(user(userDetails)));
+                            ResultActions result = mockMvc.perform(request(method, path, pathArgs).with(user(userDetails)));
                             _internalLog("[USVM] end of path analysis", path);
                         } catch (Throwable e) {
                             _internalLog("[USVM] analysis finished with exception", path);

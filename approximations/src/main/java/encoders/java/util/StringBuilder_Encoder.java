@@ -1,8 +1,8 @@
 package encoders.java.util;
 
 import generated.java.lang.StringBuilderImpl;
-import org.usvm.api.encoder.EncoderFor;
-import org.usvm.api.encoder.ObjectEncoder;
+import org.usvm.concrete.api.encoder.EncoderFor;
+import org.usvm.concrete.api.encoder.ObjectEncoder;
 
 @EncoderFor(java.lang.StringBuilder.class)
 public class StringBuilder_Encoder implements ObjectEncoder {

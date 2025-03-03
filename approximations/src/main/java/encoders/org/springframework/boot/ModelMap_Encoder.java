@@ -3,8 +3,8 @@ package encoders.org.springframework.boot;
 import generated.org.springframework.boot.ModelMapImpl;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.CollectionUtils;
-import org.usvm.api.encoder.EncoderFor;
-import org.usvm.api.encoder.ObjectEncoder;
+import org.usvm.concrete.api.encoder.EncoderFor;
+import org.usvm.concrete.api.encoder.ObjectEncoder;
 
 @SuppressWarnings("unused")
 @EncoderFor(ModelMap.class)

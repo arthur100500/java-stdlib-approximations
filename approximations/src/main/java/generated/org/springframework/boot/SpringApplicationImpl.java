@@ -37,12 +37,6 @@ public class SpringApplicationImpl {
         }
     }
 
-    private static void _initValueFieldsSymbolic(Object obj) { }
-
-    private static List<Class<?>> _classesWithFieldsValueAnnotation() {
-        return new ArrayList<>();
-    }
-
     @SuppressWarnings("unchecked")
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         // TODO: care about conditional beans
@@ -53,14 +47,6 @@ public class SpringApplicationImpl {
         DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
 //        builder.addFilters(filters);
         MockMvc mockMvc = builder.build();
-        ArrayList<Object> needToInitSymbolic = new ArrayList<>();
-        // Making fields with `@Value` annotation symbolic
-        for (Class<?> type : _classesWithFieldsValueAnnotation()) {
-            needToInitSymbolic.addAll(context.getBeansOfType(type).values());
-        }
-        for (Object bean : needToInitSymbolic) {
-            _initValueFieldsSymbolic(bean);
-        }
         Map<String, Map<String, List<Object>>> allPaths = _allControllerPaths();
         for (String controllerName : allPaths.keySet()) {
             boolean controllerFound = Engine.makeSymbolicBoolean();
@@ -73,12 +59,6 @@ public class SpringApplicationImpl {
                         List<Object> properties = paths.get(path);
                         String kind = (String) properties.get(0);
                         Integer paramCount = (Integer) properties.get(1);
-//                        List<Class<Object>> paramTypes = (List<Class<Object>>) properties.get(1);
-//                        // TODO: if primitive, make default values! #CM
-//                        Object[] pathArgs = new Object[paramTypes.size()];
-//                        for (int i = 0; i < pathArgs.length; i++) {
-//                            pathArgs[i] = LibSLRuntime.DefaultValues.getDefaultValue(paramTypes.get(i));
-//                        }
                         Object[] pathArgs = new Object[paramCount];
                         Arrays.fill(pathArgs, 0);
                         try {
@@ -97,16 +77,20 @@ public class SpringApplicationImpl {
                             _internalLog("[USVM] analysis finished with exception", path);
                         }
 
+                        _endAnalysis();
                         return;
                     }
                 }
 
+                _endAnalysis();
                 return;
             }
         }
     }
 
     private void _startAnalysis() { }
+
+    private void _endAnalysis() { }
 
     public void setListeners(Collection<? extends ApplicationListener<?>> listeners) {
         registerShutdownHook = false;

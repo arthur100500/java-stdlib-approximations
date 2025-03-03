@@ -1,8 +1,8 @@
 package encoders.java.util;
 
 import generated.java.util.set.HashSetImpl;
-import org.usvm.api.encoder.EncoderFor;
-import org.usvm.api.encoder.ObjectEncoder;
+import org.usvm.concrete.api.encoder.EncoderFor;
+import org.usvm.concrete.api.encoder.ObjectEncoder;
 
 import java.util.HashSet;
 import java.util.Set;

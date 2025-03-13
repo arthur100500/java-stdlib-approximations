@@ -90,6 +90,8 @@ public class SpringApplicationImpl {
                         _internalLog("[USVM] starting to analyze path ", path, " of controller ", controllerName);
                         List<Object> properties = paths.get(path);
                         String kind = (String) properties.get(0);
+                        writePinnedValue(PinnedValueSource.REQUEST_PATH, path);
+                        writePinnedValue(PinnedValueSource.REQUEST_METHOD, kind);
                         Integer paramCount = (Integer) properties.get(1);
                         Object[] pathArgs = new Object[paramCount];
                         Arrays.fill(pathArgs, 0);
@@ -98,6 +100,7 @@ public class SpringApplicationImpl {
                         try {
                             HttpMethod method = HttpMethod.valueOf(kind);
                             ResultActions result = mockMvc.perform(request(method, path, pathArgs).with(user(userDetails)));
+                            writePinnedValue(PinnedValueSource.RESPONSE, result);
                             _internalLog("[USVM] end of path analysis", path);
                         } catch (Throwable e) {
                             _internalLog("[USVM] analysis finished with exception", path);

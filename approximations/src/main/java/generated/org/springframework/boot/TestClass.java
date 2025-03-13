@@ -16,6 +16,6 @@ public class TestClass {
     private MockMvc mockMvc;
 
     private static void ignoreResult(Object result) {
-        
+
     }
 }

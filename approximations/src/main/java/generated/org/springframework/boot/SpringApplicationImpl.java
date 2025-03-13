@@ -9,20 +9,17 @@ import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.userdetails.User;
+//import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.usvm.api.Engine;
-import stub.java.util.map.RequestMap;
-
-import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.getPinnedValue;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.writePinnedValue;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+// import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import java.util.*;
 
@@ -59,14 +56,14 @@ public class SpringApplicationImpl {
         writePinnedValue(PinnedValueSource.REQUEST_HEADER, "AUTHORIZATION", null);
     }
 
-    private static UserDetails _createSymbolicUser() {
-        String username = getPinnedValue(PinnedValueSource.REQUEST_USER_NAME, String.class);
-        String password = getPinnedValue(PinnedValueSource.REQUEST_USER_PASSWORD, String.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        Engine.assume(username != null && !username.isEmpty());
-        Engine.assume(password != null && !password.isEmpty());
-        return new User(username, password, authorities);
-    }
+//    private static UserDetails _createSymbolicUser() {
+//        String username = getPinnedValue(PinnedValueSource.REQUEST_USER_NAME, String.class);
+//        String password = getPinnedValue(PinnedValueSource.REQUEST_USER_PASSWORD, String.class);
+//        Collection<GrantedAuthority> authorities = new ArrayList<>();
+//        Engine.assume(username != null && !username.isEmpty());
+//        Engine.assume(password != null && !password.isEmpty());
+//        return new User(username, password, authorities);
+//    }
 
 
     @SuppressWarnings("unchecked")
@@ -95,12 +92,13 @@ public class SpringApplicationImpl {
                         Integer paramCount = (Integer) properties.get(1);
                         Object[] pathArgs = new Object[paramCount];
                         Arrays.fill(pathArgs, 0);
-                        UserDetails userDetails = _createSymbolicUser();
-                        _fillSecurityHeaders();
+                        // UserDetails userDetails = _createSymbolicUser();
+                        // _fillSecurityHeaders();
                         try {
                             HttpMethod method = HttpMethod.valueOf(kind);
-                            ResultActions result = mockMvc.perform(request(method, path, pathArgs).with(user(userDetails)));
-                            writePinnedValue(PinnedValueSource.RESPONSE, result);
+                            // .with(user(userDetails))
+                            ResultActions result = mockMvc.perform(request(method, path, pathArgs));
+                            writePinnedValue(PinnedValueSource.RESPONSE, result.andReturn().getResponse());
                             _internalLog("[USVM] end of path analysis", path);
                         } catch (Throwable e) {
                             _internalLog("[USVM] analysis finished with exception", path);

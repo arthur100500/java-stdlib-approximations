@@ -2,6 +2,7 @@ package generated.org.springframework.boot;
 
 import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import jakarta.servlet.Filter;
+import jakarta.servlet.http.Cookie;
 import org.jacodb.approximation.annotation.Approximate;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationContextFactory;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpMethod;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.userdetails.User;
 //import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
@@ -21,6 +23,7 @@ import org.usvm.api.Engine;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.writePinnedValue;
 // import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -50,6 +53,21 @@ public class SpringApplicationImpl {
 
     private static List<Class<?>> _classesWithFieldsValueAnnotation() {
         return new ArrayList<>();
+    }
+
+    private static void _writeResponse(MockHttpServletResponse response) {
+        writePinnedValue(PinnedValueSource.RESPONSE_STATUS, response.getStatus());
+        try {
+            writePinnedValue(PinnedValueSource.RESPONSE_CONTENT, response.getContentAsString());
+        } catch (UnsupportedEncodingException e) {
+            _internalLog("[ERROR] Writing response content failed because of unsupported encoding: %s".formatted(e.getMessage()));
+        }
+        for (String headerName : response.getHeaderNames()) {
+            writePinnedValue(PinnedValueSource.RESPONSE_HEADER, headerName, response.getHeaders(headerName));
+        }
+        for (Cookie cookie : response.getCookies()) {
+            writePinnedValue(PinnedValueSource.REQUEST_COOKIE, cookie.getName(), cookie);
+        }
     }
 
     private static void _fillSecurityHeaders() {
@@ -98,7 +116,7 @@ public class SpringApplicationImpl {
                             HttpMethod method = HttpMethod.valueOf(kind);
                             // .with(user(userDetails))
                             ResultActions result = mockMvc.perform(request(method, path, pathArgs));
-                            writePinnedValue(PinnedValueSource.RESPONSE, result.andReturn().getResponse());
+                            _writeResponse(result.andReturn().getResponse());
                             _internalLog("[USVM] end of path analysis", path);
                         } catch (Throwable e) {
                             _internalLog("[USVM] analysis finished with exception", path);

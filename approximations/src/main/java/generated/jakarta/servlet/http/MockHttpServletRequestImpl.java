@@ -12,8 +12,12 @@ import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage
 
 @Approximate(MockHttpServletRequest.class)
 public class MockHttpServletRequestImpl {
-    public Map<String, String[]> getParameterMap() { return new RequestMultiValueMap("PARAM"); }
-    public Map<String, String[]> _getHeaderMap() { return new RequestMultiValueMap("HEADER"); }
-    public Map<String, String[]> _matrixMap() { return new RequestMultiValueMap("MATRIX"); }
-    public Map<String, String[]> _pathMap() { return new RequestMultiValueMap("PATH"); }
+    public Map<String, String[]> getParameterMap() { return new RequestMultiValueMap(PinnedValueSource.REQUEST_PARAM); }
+    public Map<String, String[]> _getHeaderMap() { return new RequestMultiValueMap(PinnedValueSource.REQUEST_HEADER); }
+    public Map<String, String[]> _matrixMap() { return new RequestMultiValueMap(PinnedValueSource.REQUEST_MATRIX); }
+    public Map<String, String[]> _pathMap() { return new RequestMultiValueMap(PinnedValueSource.REQUEST_PATH); }
+
+    // TODO: In real request all maps are multivalue, here it's taking [0] from map
+    public String getParameter(String name) { return new RequestMap(PinnedValueSource.REQUEST_PARAM).get(name); }
+    public String getHeader(String name) { return new RequestMap(PinnedValueSource.REQUEST_HEADER).get(name); }
 }

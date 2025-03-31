@@ -27,4 +27,8 @@ public class PinnedValueStorage {
     public static <T> T getPinnedValue(PinnedValueSource source, String name, Class<?> clazz) {
         return (T)_readPinnedInner(source.name(), name, clazz);
     }
+
+    public static void preparePinnedValues() {
+        throw new IllegalStateException("This method must be approximated");
+    }
 }

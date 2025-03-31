@@ -1,6 +1,7 @@
 package generated.org.springframework.boot;
 
 import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
+import generated.org.springframework.boot.pinnedValues.PinnedValueStorage;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
 import org.jacodb.approximation.annotation.Approximate;
@@ -120,6 +121,8 @@ public class SpringApplicationImpl {
                             _internalLog("[USVM] end of path analysis", path);
                         } catch (Throwable e) {
                             _internalLog("[USVM] analysis finished with exception", path);
+                        } finally {
+                            PinnedValueStorage.preparePinnedValues();
                         }
 
                         _endAnalysis();

@@ -78,6 +78,7 @@ public class SpringApplicationImpl {
     private static void _fillSecurityHeaders() {
         writePinnedValue(PinnedValueSource.REQUEST_HEADER, "AUTHORIZATION", null);
     }
+
 // TODO: Security #AA
 //    private static UserDetails _createSymbolicUser() {
 //        String username = getPinnedValue(PinnedValueSource.REQUEST_USER_NAME, String.class);

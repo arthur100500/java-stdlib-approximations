@@ -8,7 +8,7 @@ import org.usvm.api.encoder.ObjectEncoder;
 
 @SuppressWarnings("unused")
 @EncoderFor(ModelMap.class)
-    public class ModelMap_Encoder implements ObjectEncoder {
+public class ModelMap_Encoder implements ObjectEncoder {
 
     @Override
     public Object encode(Object object) {

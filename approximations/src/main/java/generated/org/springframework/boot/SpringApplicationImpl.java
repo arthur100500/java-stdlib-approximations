@@ -11,6 +11,7 @@ import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpMethod;
+// TODO: Security #AA
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.userdetails.User;
 //import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import org.usvm.api.Engine;
 
 import static generated.org.springframework.boot.pinnedValues.PinnedValueSource.RESPONSE_EXCEPTION;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.writePinnedValue;
+// TODO: Security #AA
 // import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import java.io.UnsupportedEncodingException;
@@ -76,7 +78,7 @@ public class SpringApplicationImpl {
     private static void _fillSecurityHeaders() {
         writePinnedValue(PinnedValueSource.REQUEST_HEADER, "AUTHORIZATION", null);
     }
-
+// TODO: Security #AA
 //    private static UserDetails _createSymbolicUser() {
 //        String username = getPinnedValue(PinnedValueSource.REQUEST_USER_NAME, String.class);
 //        String password = getPinnedValue(PinnedValueSource.REQUEST_USER_PASSWORD, String.class);
@@ -112,10 +114,12 @@ public class SpringApplicationImpl {
 
             Object[] pathArgs = new Object[paramCount];
             Arrays.fill(pathArgs, 0);
+            // TODO: Security #AA
             // UserDetails userDetails = _createSymbolicUser();
             // _fillSecurityHeaders();
             try {
                 HttpMethod method = HttpMethod.valueOf(methodName);
+                // TODO: Security #AA
                 // .with(user(userDetails))
                 ResultActions result = mockMvc.perform(request(method, path, pathArgs));
                 _writeResponse(result.andReturn().getResponse());

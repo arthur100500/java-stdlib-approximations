@@ -19,5 +19,6 @@ public enum PinnedValueSource {
     RESPONSE_CONTENT,
     RESPONSE_COOKIE,
     RESPONSE_HEADER,
+    RESPONSE_EXCEPTION,
     MOCK_RESULT
 }

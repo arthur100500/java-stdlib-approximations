@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.usvm.api.Engine;
+
+import static generated.org.springframework.boot.pinnedValues.PinnedValueSource.RESPONSE_EXCEPTION;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage.writePinnedValue;
 // import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
@@ -38,8 +40,8 @@ public class SpringApplicationImpl {
 
     private boolean registerShutdownHook = false;
 
-    private Map<String, Map<String, List<Object>>> _allControllerPaths() {
-        return new HashMap<>();
+    private List<List<Object>> _allControllerPaths() {
+        return new ArrayList<>();
     }
 
     public static void _println(String message) { }
@@ -84,8 +86,6 @@ public class SpringApplicationImpl {
 //        return new User(username, password, authorities);
 //    }
 
-
-    @SuppressWarnings("unchecked")
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         // TODO: care about conditional beans
         _startAnalysis();
@@ -95,44 +95,39 @@ public class SpringApplicationImpl {
         DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
         builder.addFilters(filters);
         MockMvc mockMvc = builder.build();
-        Map<String, Map<String, List<Object>>> allPaths = _allControllerPaths();
-        for (String controllerName : allPaths.keySet()) {
-            boolean controllerFound = Engine.makeSymbolicBoolean();
-            if (controllerFound) {
-                Map<String, List<Object>> paths = allPaths.get(controllerName);
-                for (String path : paths.keySet()) {
-                    boolean pathFound = Engine.makeSymbolicBoolean();
-                    if (pathFound) {
-                        _internalLog("[USVM] starting to analyze path ", path, " of controller ", controllerName);
-                        List<Object> properties = paths.get(path);
-                        String kind = (String) properties.get(0);
-                        writePinnedValue(PinnedValueSource.REQUEST_PATH, path);
-                        writePinnedValue(PinnedValueSource.REQUEST_METHOD, kind);
-                        Integer paramCount = (Integer) properties.get(1);
-                        Object[] pathArgs = new Object[paramCount];
-                        Arrays.fill(pathArgs, 0);
-                        // UserDetails userDetails = _createSymbolicUser();
-                        // _fillSecurityHeaders();
-                        try {
-                            HttpMethod method = HttpMethod.valueOf(kind);
-                            // .with(user(userDetails))
-                            ResultActions result = mockMvc.perform(request(method, path, pathArgs));
-                            _writeResponse(result.andReturn().getResponse());
-                            _internalLog("[USVM] end of path analysis", path);
-                        } catch (Throwable e) {
-                            _internalLog("[USVM] analysis finished with exception", path);
-                        } finally {
-                            PinnedValueStorage.preparePinnedValues();
-                        }
+        List<List<Object>> allPaths = _allControllerPaths();
+        for (List<Object> pathData : allPaths) {
+            boolean pathFound = Engine.makeSymbolicBoolean();
+            if (!pathFound)
+                continue;
 
-                        _endAnalysis();
-                        return;
-                    }
-                }
+            String controllerName = (String) pathData.get(0);
+            String path = (String) pathData.get(2);
+            Integer paramCount = (Integer) pathData.get(3);
+            String methodName = (String) pathData.get(4);
 
+            _internalLog("[USVM] starting to analyze path ", path, " of controller ", controllerName);
+            writePinnedValue(PinnedValueSource.REQUEST_PATH, path);
+            writePinnedValue(PinnedValueSource.REQUEST_METHOD, methodName);
+
+            Object[] pathArgs = new Object[paramCount];
+            Arrays.fill(pathArgs, 0);
+            // UserDetails userDetails = _createSymbolicUser();
+            // _fillSecurityHeaders();
+            try {
+                HttpMethod method = HttpMethod.valueOf(methodName);
+                // .with(user(userDetails))
+                ResultActions result = mockMvc.perform(request(method, path, pathArgs));
+                _writeResponse(result.andReturn().getResponse());
+                _internalLog("[USVM] end of path analysis", path);
+            } catch (Throwable e) {
+                writePinnedValue(RESPONSE_EXCEPTION, e);
+                _internalLog("[USVM] analysis finished with exception", path);
+            } finally {
+                PinnedValueStorage.preparePinnedValues();
                 _endAnalysis();
-                return;
             }
+            return;
         }
     }
 

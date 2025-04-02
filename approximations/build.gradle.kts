@@ -17,7 +17,9 @@ dependencies {
     compileOnly("$jacodbPackage:jacodb-approximations:$jacodbVersion")
     compileOnly(files(rootDir.resolve("usvm-api/usvm-jvm-api.jar")))
     compileOnly(files(rootDir.resolve("usvm-api/usvm-jvm-concrete-api.jar")))
-
+    // TODO: Security #AA
+    // compileOnly("org.springframework.boot:spring-boot-starter-security:3.3.4")
+    // compileOnly("org.springframework.security:spring-security-test:6.2.0")
     compileOnly("org.springframework.boot:spring-boot-starter-web:3.3.4")
     compileOnly("org.springframework.boot:spring-boot-starter-test:3.3.4")
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa:3.3.4")

@@ -2,8 +2,8 @@ package encoders.java.util;
 
 import generated.java.util.map.ConcurrentReferenceHashMapImpl;
 import org.springframework.util.ConcurrentReferenceHashMap;
-import org.usvm.concrete.api.encoder.EncoderFor;
-import org.usvm.concrete.api.encoder.ObjectEncoder;
+import org.usvm.api.encoder.EncoderFor;
+import org.usvm.api.encoder.ObjectEncoder;
 
 @EncoderFor(ConcurrentReferenceHashMap.class)
 public class ConcurrentReferenceHashMap_Encoder implements ObjectEncoder {

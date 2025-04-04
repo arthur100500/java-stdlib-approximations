@@ -11,7 +11,7 @@ public class ResolverUtils {
         Engine.assume(!string.isEmpty());
         return string;
     }
-    
+
     public static Object createNullPinned(PinnedValueSource source, String name, Class<?> clazz) {
         PinnedValueStorage.writePinnedValue(source, name, null, clazz);
         return PinnedValueStorage.getPinnedValue(source, name, clazz);

@@ -12,6 +12,6 @@ import org.springframework.web.servlet.mvc.method.annotation.MatrixVariableMetho
 public class MatrixVariableMethodArgumentResolverImpl {
     @Nullable
     protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
-        return PinnedValueStorage.getPinnedValue(PinnedValueSource.REQUEST_MATRIX, name, String.class);
+        return ResolverUtils.getNonEmptySymbolicString(PinnedValueSource.REQUEST_MATRIX, name);
     }
 }

@@ -15,6 +15,10 @@ public class PinnedValueStorage {
 
     public static void writePinnedValue(PinnedValueSource source, String name, Object value) {
         Class<?> clazz = value.getClass();
+        writePinnedValue(source, name, value, clazz);
+    }
+
+    public static void writePinnedValue(PinnedValueSource source, String name, Object value, Class<?> clazz) {
         _writePinnedInner(source.name(), name, value, clazz);
     }
 

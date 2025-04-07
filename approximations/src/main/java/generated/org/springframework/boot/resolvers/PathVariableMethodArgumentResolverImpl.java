@@ -8,17 +8,23 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.PathVariableMethodArgumentResolver;
 
+import static generated.org.springframework.boot.SpringApplicationImpl._println;
+
 @Approximate(PathVariableMethodArgumentResolver.class)
 public class PathVariableMethodArgumentResolverImpl {
     @Nullable
     protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
-        if (parameter.getParameterName() == null)
-            return null;
+        String parameterName = parameter.getParameterName();
+        String path = request.getContextPath();
+        if (parameterName == null) {
+            return ResolverUtils.createNullPinned(PinnedValueSource.REQUEST_PATH_VARIABLE, name, String.class);
+        }
 
-        if (!request.getContextPath().contains(String.format("{%s}", parameter.getParameterName())))
-            return null;
+        if (!path.contains(String.format("{%s}", parameterName))) {
+            _println(String.format("Warning! %s did not contain %s", path, parameterName));
+            return ResolverUtils.createNullPinned(PinnedValueSource.REQUEST_PATH_VARIABLE, name, String.class);
+        }
 
-        return PinnedValueStorage.getPinnedValue(PinnedValueSource.REQUEST_PATH_VARIABLE, name, String.class);
+        return ResolverUtils.getNonEmptySymbolicString(PinnedValueSource.REQUEST_PATH_VARIABLE, name);
     }
 }
-

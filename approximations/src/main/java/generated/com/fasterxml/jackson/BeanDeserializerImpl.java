@@ -98,8 +98,10 @@ public class BeanDeserializerImpl extends BeanDeserializer {
         // SpringApplicationImpl._println(String.format("[Deserializing (deserializeFromObject)] Iteration: %d; Type: %s", _iteration, clazz));
 
         for (SettableBeanProperty property : _beanProperties) {
-            if (_isJsonPrimitive(property.getType()))
-                property.set(bean, SymbolicValueFactory.createSymbolic(property.getType().getRawClass(), true));
+            if (_isJsonPrimitive(property.getType())) {
+                Object value = SymbolicValueFactory.createSymbolic(property.getType().getRawClass(), true);
+                property.set(bean, value);
+            }
             else
                 property.deserializeAndSet(p, ctxt, bean);
         }

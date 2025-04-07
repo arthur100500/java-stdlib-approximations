@@ -10,6 +10,6 @@ import org.springframework.web.method.annotation.RequestHeaderMethodArgumentReso
 @Approximate(RequestHeaderMethodArgumentResolver.class)
 public class RequestHeaderMethodArgumentResolverImpl {
     protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
-        return PinnedValueStorage.getPinnedValue(PinnedValueSource.REQUEST_HEADER, name, String.class);
+        return ResolverUtils.getNonEmptySymbolicString(PinnedValueSource.REQUEST_HEADER, name);
     }
 }

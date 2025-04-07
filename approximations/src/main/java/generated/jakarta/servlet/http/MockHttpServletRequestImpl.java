@@ -25,4 +25,8 @@ public class MockHttpServletRequestImpl {
     public String getHeader(String name) {
         return PinnedValueStorage.getPinnedValue(PinnedValueSource.REQUEST_HEADER, name, String.class);
     }
+
+    public String getContextPath() {
+        return PinnedValueStorage.getPinnedValue(PinnedValueSource.REQUEST_PATH, String.class);
+    }
 }

@@ -4,6 +4,10 @@ import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import generated.org.springframework.boot.pinnedValues.PinnedValueStorage;
 import org.usvm.api.Engine;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
 public class ResolverUtils {
     public static String getNonEmptySymbolicString(PinnedValueSource source, String name) {
         String string = PinnedValueStorage.getPinnedValue(source, name, String.class);
@@ -15,5 +19,15 @@ public class ResolverUtils {
     public static Object createNullPinned(PinnedValueSource source, String name, Class<?> clazz) {
         PinnedValueStorage.writePinnedValue(source, name, null, clazz);
         return PinnedValueStorage.getPinnedValue(source, name, clazz);
+    }
+
+    public static Boolean isPrimitive(Class<?> clazz) {
+        List<Class<?>> primitives = Arrays.asList(
+                String.class,
+                Integer.class,
+                Boolean.class,
+                LocalDate.class
+        );
+        return primitives.contains(clazz) || clazz.isPrimitive();
     }
 }

@@ -40,6 +40,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class SpringApplicationImpl {
 
     private static final boolean SECURITY_ENABLED = false;
+    // TODO: Stuff with versions for spring 2.x.x #AA
+    private static final boolean SUPPORTS_COOKIES = false;
 
     private List<ApplicationListener<?>> listeners;
 
@@ -75,8 +77,10 @@ public class SpringApplicationImpl {
         for (String headerName : response.getHeaderNames()) {
             writePinnedValue(PinnedValueSource.RESPONSE_HEADER, headerName, response.getHeaders(headerName));
         }
-        for (Cookie cookie : response.getCookies()) {
-            writePinnedValue(PinnedValueSource.REQUEST_COOKIE, cookie.getName(), cookie);
+        if (SUPPORTS_COOKIES) {
+            for (Cookie cookie : response.getCookies()) {
+                writePinnedValue(PinnedValueSource.REQUEST_COOKIE, cookie.getName(), cookie);
+            }
         }
     }
 

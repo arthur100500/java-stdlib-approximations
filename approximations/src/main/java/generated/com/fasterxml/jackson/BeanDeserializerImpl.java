@@ -43,15 +43,15 @@ public class BeanDeserializerImpl extends BeanDeserializer {
     public final static int MAX_DEPTH = 3;
     public final static int MAX_LENGTH = 3;
 
-    private boolean isPrimitive(JavaType type) {
+    private static boolean isPrimitive(JavaType type) {
         return ResolverUtils.isPrimitiveOrWrapper(type.getRawClass());
     }
 
-    private boolean isCollection(JavaType type) {
+    private static boolean isCollection(JavaType type) {
         return type.isArrayType() || type.isCollectionLikeType();
     }
 
-    private void _writeToState(Object root) {
+    public static void writeToState(Object root) {
         writePinnedValue(PinnedValueSource.REQUEST_BODY, root);
     }
 
@@ -74,7 +74,7 @@ public class BeanDeserializerImpl extends BeanDeserializer {
 
         if (ResolverUtils.isPrimitiveOrWrapper(clazz)) {
             Object result = SymbolicValueFactory.createSymbolic(clazz, true);
-            _writeToState(result);
+            writeToState(result);
             return result;
         }
 
@@ -133,8 +133,16 @@ public class BeanDeserializerImpl extends BeanDeserializer {
 
             List<Object> valueAndCopy = generateSymbolicPropertyValue(property, p, ctxt, depth);
 
-            property.set(bean, valueAndCopy.get(0));
-            property.set(beanCopy, valueAndCopy.get(1));
+            try {
+                property.set(bean, valueAndCopy.get(0));
+                property.set(beanCopy, valueAndCopy.get(1));
+            } catch (Throwable t) {
+                SpringApplicationImpl._println(String.format(
+                        "[Warning!] Unable to write property \"%s\", exception was thrown (%s)",
+                        property.getFullName(),
+                        t
+                ));
+            }
         }
 
         return Arrays.asList(bean, beanCopy);
@@ -151,7 +159,7 @@ public class BeanDeserializerImpl extends BeanDeserializer {
         return generateSymbolic(propertyType, valueDeserializer, p, ctxt, depth);
     }
 
-    private List<Object> generateSymbolic(
+    public static List<Object> generateSymbolic(
             JavaType type,
             JsonDeserializer<Object> deserializer,
             JsonParser p,
@@ -175,7 +183,7 @@ public class BeanDeserializerImpl extends BeanDeserializer {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Object> generateSymbolicCollection(
+    private static List<Object> generateSymbolicCollection(
             JavaType type,
             JsonDeserializer<Object> deserializer,
             JsonParser p,
@@ -253,7 +261,7 @@ public class BeanDeserializerImpl extends BeanDeserializer {
             return deserializeFromObjectReal(p, ctxt);
 
         List<Object> beanAndCopy = generateSymbolicBean(p, ctxt, 0);
-        _writeToState(beanAndCopy.get(1));
+        writeToState(beanAndCopy.get(1));
         return beanAndCopy.get(0);
     }
 

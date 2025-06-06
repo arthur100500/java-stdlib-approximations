@@ -292,6 +292,11 @@ public class StringImpl implements Serializable {
         LibSLRuntime.ArrayActions.copy(this.value, srcByteBegin, dst, dstByteBegin, count);
     }
 
+    public boolean isEmpty() {
+        _assumeInvariants();
+        return value.length == 0;
+    }
+
     public static boolean latin1Equals(byte[] value, byte[] other) {
         if (value.length == other.length) {
             for(int i = 0; i < value.length; ++i) {

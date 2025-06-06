@@ -3,8 +3,10 @@ package generated.org.springframework.boot;
 import generated.org.springframework.boot.databases.wrappers.ListWrapper;
 import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import generated.org.springframework.boot.pinnedValues.PinnedValueStorage;
+import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
 import org.jacodb.approximation.annotation.Approximate;
+import org.mockito.Mock;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationContextFactory;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
@@ -24,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 import org.usvm.api.Engine;
 
+import static generated.org.springframework.boot.pinnedValues.PinnedValueSource.REQUEST_USER;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueSource.RESOLVED_EXCEPTION_CLASS;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueSource.RESOLVED_EXCEPTION_MESSAGE;
 import static generated.org.springframework.boot.pinnedValues.PinnedValueSource.UNHANDLED_EXCEPTION_CLASS;
@@ -40,7 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @Approximate(org.springframework.boot.SpringApplication.class)
 public class SpringApplicationImpl {
 
-    private static final boolean SECURITY_ENABLED = false;
+    private static final boolean SECURITY_ENABLED = true;
 
     private List<ApplicationListener<?>> listeners;
 
@@ -50,6 +53,10 @@ public class SpringApplicationImpl {
 
     private List<List<Object>> _allControllerPaths() {
         return new ArrayList<>();
+    }
+
+    private void _testMockMvc(MockMvc skibidi) {
+
     }
 
     public static void _println(String message) { }
@@ -72,6 +79,14 @@ public class SpringApplicationImpl {
         throw new LinkageError();
     }
 
+    private static boolean _shouldBuildMockMvc() {
+        throw new IllegalArgumentException("Must be approximated");
+    }
+
+    private static List<Class<?>> _classesWithFieldsValueAnnotation() {
+        return new ArrayList<>();
+    }
+
     private static void _writeResponse(MockHttpServletResponse response) {
         writePinnedValue(PinnedValueSource.RESPONSE_STATUS, response.getStatus());
         try {
@@ -88,16 +103,12 @@ public class SpringApplicationImpl {
     }
 
     private static void _fillSecurityHeaders() {
-        writePinnedValue(PinnedValueSource.REQUEST_HEADER, "AUTHORIZATION", null);
+        writePinnedValue(PinnedValueSource.REQUEST_HEADER, "AUTHORIZATION", null, String.class);
     }
 
-    private static UserDetails _createSymbolicUser() {
-        String username = getPinnedValue(PinnedValueSource.REQUEST_USER_NAME, String.class);
-        String password = getPinnedValue(PinnedValueSource.REQUEST_USER_PASSWORD, String.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        Engine.assume(username != null && !username.isEmpty());
-        Engine.assume(password != null && !password.isEmpty());
-        return new User(username, password, authorities);
+    private static UserDetails _createUser() {
+        String warningText = "USVM USER NAME OR PASSWORD";
+        return new User(warningText, warningText, Collections.emptyList());
     }
 
     private void writeResult(MvcResult result) {
@@ -120,12 +131,20 @@ public class SpringApplicationImpl {
     protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
         // TODO: care about conditional beans
         _startAnalysis();
-        // TODO: enable filters!
-//        Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
-//        Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
-        DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
-//        builder.addFilters(filters);
-        MockMvc mockMvc = builder.build();
+        MockMvc mockMvc;
+        if (_shouldBuildMockMvc()) {
+            _internalLog("Building mock mvc via DefaultMockMvcBuilder");
+            Object[] beans = context.getBeansOfType(Filter.class).values().toArray();
+            Filter[] filters = Arrays.copyOf(beans, beans.length, Filter[].class);
+            DefaultMockMvcBuilder builder = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context);
+            builder.addFilters(filters);
+            mockMvc = builder.build();
+        } else {
+            _internalLog("Reading mock mvc via getBean()");
+            mockMvc = context.getBean(MockMvc.class);
+        }
+
+        _testMockMvc(mockMvc);
         List<List<Object>> allPaths = _allControllerPaths();
         for (List<Object> pathData : allPaths) {
             boolean pathFound = Engine.makeSymbolicBoolean();
@@ -147,7 +166,8 @@ public class SpringApplicationImpl {
                 HttpMethod method = HttpMethod.valueOf(methodName);
                 MockHttpServletRequestBuilder request = request(method, path, pathArgs);
                 if (SECURITY_ENABLED) {
-                    UserDetails userDetails = _createSymbolicUser();
+                    // Makes successful authorization
+                    UserDetails userDetails = _createUser();
                     _fillSecurityHeaders();
                     request = request.with(user(userDetails));
                 }

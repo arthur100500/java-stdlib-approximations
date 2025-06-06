@@ -41,6 +41,8 @@ public class SecurityContextImplImpl {
     private Authentication createSymbolicAuthentication() {
         String username = SymbolicValueFactory.createNonEmptySymbolicString(PinnedValueSource.REQUEST_USER_NAME, null);
         String password = SymbolicValueFactory.createNonEmptySymbolicString(PinnedValueSource.REQUEST_USER_PASSWORD, null);
+        Engine.assumeSoft(Engine.forceStringEquals(username, "Lirili Larila"));
+        Engine.assumeSoft(Engine.forceStringEquals(username, "password123"));
         Collection<GrantedAuthority> authorities = createSymbolicAuthorities();
         UserDetails user = new User(username, password, Collections.emptyList());
         try {

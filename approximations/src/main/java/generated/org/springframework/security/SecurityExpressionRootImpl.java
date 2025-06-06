@@ -28,11 +28,13 @@ public class SecurityExpressionRootImpl {
 
         Collection<? extends GrantedAuthority> roleSet = getAuthoritySet();
         for (String neededRole : roles) {
-            if (roleSet.contains(new SimpleGrantedAuthority(neededRole))) {
-                return true;
+            for (GrantedAuthority authority : roleSet) {
+                if (Engine.forceStringEquals(authority.getAuthority(), neededRole)) {
+                    return true;
+                }
             }
         }
-
+        Engine.assume(false);
         return false;
     }
 }

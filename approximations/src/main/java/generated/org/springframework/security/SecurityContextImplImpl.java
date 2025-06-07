@@ -4,6 +4,7 @@ import generated.org.springframework.boot.SpringApplicationImpl;
 import generated.org.springframework.boot.SymbolicValueFactory;
 import generated.org.springframework.boot.pinnedValues.PinnedValueSource;
 import org.jacodb.approximation.annotation.Approximate;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,46 +26,55 @@ import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage
 public class SecurityContextImplImpl {
 
     private static Authentication cachedAuthentication;
-    private static Collection<GrantedAuthority> cachedAuthorities;
+    private static ArrayList<GrantedAuthority> cachedAuthorities;
 
-    public static Collection<GrantedAuthority> createSymbolicAuthorities() {
+    public static Collection<GrantedAuthority> getSymbolicAuthorities() {
+        // Create symbolic user is a must
+        if (cachedAuthentication == null || cachedAuthorities == null)
+            getSymbolicAuthentication();
+
+        return cachedAuthorities;
+    }
+
+    private static Collection<GrantedAuthority> createSymbolicAuthorities() {
         if (cachedAuthorities != null)
             return cachedAuthorities;
 
-        Collection<GrantedAuthority> authorities = getPinnedValue(PinnedValueSource.REQUEST_USER_AUTHORITIES, ArrayList.class);
+        ArrayList<GrantedAuthority> authorities = getPinnedValue(PinnedValueSource.REQUEST_USER_AUTHORITIES, ArrayList.class);
         Engine.assume(authorities != null);
-        Engine.assume(authorities.size() < 5);
+        Engine.assume(authorities.size() < 3);
         cachedAuthorities = authorities;
         return authorities;
     }
 
-    private Authentication createSymbolicAuthentication() {
-        String username = SymbolicValueFactory.createNonEmptySymbolicString(PinnedValueSource.REQUEST_USER_NAME, null);
-        String password = SymbolicValueFactory.createNonEmptySymbolicString(PinnedValueSource.REQUEST_USER_PASSWORD, null);
-        Engine.assumeSoft(Engine.forceStringEquals(username, "Lirili Larila"));
-        Engine.assumeSoft(Engine.forceStringEquals(username, "password123"));
-        Collection<GrantedAuthority> authorities = createSymbolicAuthorities();
-        UserDetails user = new User(username, password, Collections.emptyList());
-        try {
-            Field authoritiesField = User.class.getDeclaredField("authorities");
-            authoritiesField.setAccessible(true);
-            authoritiesField.set(user, authorities);
-        } catch (Exception e) {
-            SpringApplicationImpl._println("Warning! Error setting authorities!");
-        }
-
-        return new UsernamePasswordAuthenticationToken(
+    private static Authentication getSymbolicAuthentication() {
+        UserDetails user = Engine.makeNullableSymbolicSubtype(UserDetails.class);
+        Engine.assume(user != null);
+        Engine.assumeSoft(Engine.forceStringEquals(user.getUsername(), "Test user"));
+        Engine.assumeSoft(Engine.forceStringEquals(user.getPassword(), "Test password"));
+        Collection<GrantedAuthority> symbolicAuthorities = createSymbolicAuthorities();
+        Engine.assume(user.getAuthorities() == symbolicAuthorities);
+        writePinnedValue(PinnedValueSource.REQUEST_USER, user);
+        Authentication result = new UsernamePasswordAuthenticationToken(
                 user,
                 null,
-                user.getAuthorities()
+                Collections.emptyList()
         );
+        try {
+            Field authoritiesField = AbstractAuthenticationToken.class.getDeclaredField("authorities");
+            authoritiesField.setAccessible(true);
+            authoritiesField.set(result, symbolicAuthorities);
+        } catch (Exception e) {
+            SpringApplicationImpl._println("Warning! Error setting field authorities! " + e.getMessage());
+        }
+        return result;
     }
 
     public Authentication getAuthentication() {
         if (cachedAuthentication != null)
             return cachedAuthentication;
 
-        Authentication result = createSymbolicAuthentication();
+        Authentication result = getSymbolicAuthentication();
         cachedAuthentication = result;
         return result;
     }

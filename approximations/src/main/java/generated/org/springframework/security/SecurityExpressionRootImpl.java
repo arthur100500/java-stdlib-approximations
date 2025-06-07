@@ -16,8 +16,8 @@ import java.util.Set;
 @Approximate(SecurityExpressionRoot.class)
 public class SecurityExpressionRootImpl {
 
-    private Collection<? extends GrantedAuthority> getAuthoritySet() {
-        return SecurityContextImplImpl.createSymbolicAuthorities();
+    private Collection<GrantedAuthority> getAuthoritySet() {
+        return SecurityContextImplImpl.getSymbolicAuthorities();
     }
 
     private boolean hasAnyAuthorityName(String prefix, String... roles) {
@@ -26,15 +26,23 @@ public class SecurityExpressionRootImpl {
             SpringApplicationImpl._println(neededRole);
         }
 
-        Collection<? extends GrantedAuthority> roleSet = getAuthoritySet();
+        Collection<GrantedAuthority> roleSet = getAuthoritySet();
         for (String neededRole : roles) {
             for (GrantedAuthority authority : roleSet) {
-                if (Engine.forceStringEquals(authority.getAuthority(), neededRole)) {
+                Engine.assume(authority instanceof GrantedAuthority);
+                Engine.assume(authority != null);
+                Engine.assume(authority.getAuthority() != null);
+                if (Engine.forceStringEquals(authority.getAuthority(), roleWithPrefix(prefix, neededRole))) {
                     return true;
                 }
             }
         }
         Engine.assume(false);
         return false;
+    }
+
+    private String roleWithPrefix(String prefix, String role) {
+        if (prefix == null) return role;
+        return prefix + role;
     }
 }

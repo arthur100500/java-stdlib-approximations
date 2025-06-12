@@ -16,8 +16,9 @@ import java.util.Set;
 @Approximate(SecurityExpressionRoot.class)
 public class SecurityExpressionRootImpl {
 
+    @SuppressWarnings("unchecked")
     private Collection<GrantedAuthority> getAuthoritySet() {
-        return SecurityContextImplImpl.getSymbolicAuthorities();
+        return (Collection<GrantedAuthority>) new SecurityContextImplImpl().getAuthentication().getAuthorities();
     }
 
     private boolean hasAnyAuthorityName(String prefix, String... roles) {
@@ -29,7 +30,6 @@ public class SecurityExpressionRootImpl {
         Collection<GrantedAuthority> roleSet = getAuthoritySet();
         for (String neededRole : roles) {
             for (GrantedAuthority authority : roleSet) {
-                Engine.assume(authority instanceof GrantedAuthority);
                 Engine.assume(authority != null);
                 Engine.assume(authority.getAuthority() != null);
                 if (Engine.forceStringEquals(authority.getAuthority(), roleWithPrefix(prefix, neededRole))) {

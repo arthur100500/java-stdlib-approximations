@@ -25,21 +25,22 @@ import static generated.org.springframework.boot.pinnedValues.PinnedValueStorage
 @Approximate(SecurityContextImpl.class)
 public class SecurityContextImplImpl {
 
-    private static Authentication cachedAuthentication;
-    private static ArrayList<GrantedAuthority> cachedAuthorities;
+    private static Authentication cachedAuthentication = null;
+    private static ArrayList<GrantedAuthority> cachedAuthorities = null;
 
-    public static Collection<GrantedAuthority> getSymbolicAuthorities() {
-        // Create symbolic user is a must
-        if (cachedAuthentication == null || cachedAuthorities == null)
-            getSymbolicAuthentication();
-
-        return cachedAuthorities;
-    }
+//    public static Collection<GrantedAuthority> getSymbolicAuthorities() {
+//        // Create symbolic user is a must
+//        if (cachedAuthentication == null || cachedAuthorities == null)
+//            getSymbolicAuthentication();
+//
+//        return cachedAuthorities;
+//    }
 
     private static Collection<GrantedAuthority> createSymbolicAuthorities() {
         if (cachedAuthorities != null)
             return cachedAuthorities;
 
+        SpringApplicationImpl._println("Creating symbolic authorities");
         ArrayList<GrantedAuthority> authorities = getPinnedValue(PinnedValueSource.REQUEST_USER_AUTHORITIES, ArrayList.class);
         Engine.assume(authorities != null);
         Engine.assume(authorities.size() < 3);
@@ -47,13 +48,42 @@ public class SecurityContextImplImpl {
         return authorities;
     }
 
-    private static Authentication getSymbolicAuthentication() {
-        UserDetails user = Engine.makeNullableSymbolicSubtype(UserDetails.class);
+    private static Class<? extends UserDetails> _getUserClass() {
+        throw new IllegalStateException("This method must be approximated!");
+    }
+
+    private static void assumeUserInvariants(UserDetails user, Class<?> userClass) {
         Engine.assume(user != null);
+
+        Field[] fields = userClass.getDeclaredFields();
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                if (Collection.class == field.getType()) {
+                    SpringApplicationImpl._println(String.format(
+                            "user.%s is rewritten to new ArrayList",
+                            field.getName()
+                    ));
+                    Object arrayList = SymbolicValueFactory.createSymbolic(ArrayList.class, false);
+                    Engine.assume(((ArrayList)arrayList).size() < 4);
+                    field.set(user, arrayList);
+                }
+            } catch (IllegalAccessException e) {
+                SpringApplicationImpl._println("Warning! Error assuming field data: " + e.getMessage());
+            }
+        }
+
         Engine.assumeSoft(Engine.forceStringEquals(user.getUsername(), "Test user"));
         Engine.assumeSoft(Engine.forceStringEquals(user.getPassword(), "Test password"));
-        Collection<GrantedAuthority> symbolicAuthorities = createSymbolicAuthorities();
-        Engine.assume(user.getAuthorities() == symbolicAuthorities);
+        // Collection<GrantedAuthority> symbolicAuthorities = createSymbolicAuthorities();
+        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+        Engine.assume(authorities.size() < 5);
+    }
+
+    private static Authentication getSymbolicAuthentication() {
+        Class<? extends UserDetails> userClass = _getUserClass();
+        UserDetails user = Engine.makeNullableSymbolicSubtype(userClass);
+        assumeUserInvariants(user, userClass);
         writePinnedValue(PinnedValueSource.REQUEST_USER, user);
         Authentication result = new UsernamePasswordAuthenticationToken(
                 user,
@@ -63,7 +93,7 @@ public class SecurityContextImplImpl {
         try {
             Field authoritiesField = AbstractAuthenticationToken.class.getDeclaredField("authorities");
             authoritiesField.setAccessible(true);
-            authoritiesField.set(result, symbolicAuthorities);
+            authoritiesField.set(result, user.getAuthorities());
         } catch (Exception e) {
             SpringApplicationImpl._println("Warning! Error setting field authorities! " + e.getMessage());
         }

@@ -44,7 +44,7 @@ public final class Set_IteratorImpl<E> extends AbstractIteratorImpl<E> {
     }
 
     private boolean _isEmpty() {
-        return this.unseen.size() == 0;
+        return !this.unseen.hasKey(unseen.anyKey());
     }
 
     public void forEachRemaining(Consumer<? super E> userAction) {

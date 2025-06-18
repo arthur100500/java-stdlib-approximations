@@ -22,21 +22,17 @@ public class SecurityExpressionRootImpl {
     }
 
     private boolean hasAnyAuthorityName(String prefix, String... roles) {
-        SpringApplicationImpl._println("Attempting to check authorities:");
-        for (String neededRole : roles) {
-            SpringApplicationImpl._println(neededRole);
-        }
-
         Collection<GrantedAuthority> roleSet = getAuthoritySet();
         for (String neededRole : roles) {
             for (GrantedAuthority authority : roleSet) {
                 Engine.assume(authority != null);
                 Engine.assume(authority.getAuthority() != null);
-                if (Engine.forceStringEquals(authority.getAuthority(), roleWithPrefix(prefix, neededRole))) {
+
+                if (Engine.forceStringEquals(authority.getAuthority(), roleWithPrefix(prefix, neededRole)))
                     return true;
-                }
             }
         }
+
         Engine.assume(false);
         return false;
     }
